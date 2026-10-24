@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chi2power"
+version = "1.1.0"
+description = "G*Power Ki-kare Olumsallık Tabloları ve Yanıt Oranları Güç Analizi (Clean-room re-implementation)"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+gpower-clone = "chi2power.cli:main"
+gpower-clone-mcp = "chi2power.mcp_server:main"
+gpower-clone-agent = "chi2power.agent:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+# Paket kurulmadan da `python -m pytest` çalışsın diye src/ yola eklenir
+pythonpath = ["src"]
+testpaths = ["tests"]

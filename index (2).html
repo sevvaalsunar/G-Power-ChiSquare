@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>χ² Olumsallık Tabloları · G*Power klonu test platformu</title>
+<style>
+  :root {
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --bg: #eff0ec;
+    --surface: #ffffff;
+    --sunken: #f6f7f4;
+    --ink: #141b26;
+    --muted: #5c6470;
+    --faint: #959ba4;
+    --line: #e4e6e1;
+    --line-strong: #cdd1ca;
+    --accent: #1b4b5e;
+    --accent-ink: #ffffff;
+    --accent-soft: #e5edef;
+    --ok: #2d6a4c;
+    --ok-soft: #e6f1ea;
+    --bad: #a2322b;
+    --bad-soft: #f8e9e7;
+    --wait: #886719;
+    --wait-soft: #f6efdc;
+    --shadow: 0 1px 2px rgba(20, 27, 38, .04), 0 8px 24px -12px rgba(20, 27, 38, .10);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #11151b;
+      --surface: #181e26;
+      --sunken: #141920;
+      --ink: #e7e9ec;
+      --muted: #a3aab5;
+      --faint: #737b87;
+      --line: #262e39;
+      --line-strong: #36404c;
+      --accent: #8fbfd0;
+      --accent-ink: #0e1a20;
+      --accent-soft: #1f2f37;
+      --ok: #79c39b;
+      --ok-soft: #1a2c22;
+      --bad: #ee8e86;
+      --bad-soft: #35201e;
+      --wait: #dcb557;
+      --wait-soft: #302815;
+      --shadow: none;
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.55 var(--sans);
+    font-variant-numeric: tabular-nums lining-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 36px 28px 56px; }
+  code { font: 12.5px ui-monospace, Menlo, Consolas, monospace; background: var(--sunken); padding: 1px 5px; border-radius: 4px; }
+
+  /* Başlık */
+  header.top {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end;
+    gap: 20px 32px; padding-bottom: 24px; margin-bottom: 28px; border-bottom: 1px solid var(--line-strong);
+  }
+  @media (max-width: 760px) { header.top { grid-template-columns: 1fr; } }
+  header.top .kicker { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+  header.top h1 {
+    font-family: var(--serif); font-weight: 500; font-size: clamp(26px, 3.4vw, 38px);
+    line-height: 1.12; letter-spacing: -.01em; margin: 0; max-width: 24ch;
+  }
+  .tester { display: grid; gap: 6px; font-size: 12.5px; color: var(--muted); }
+  .tester select { min-width: 220px; font-size: 14px; padding: 8px 10px; }
+
+  /* Paneller */
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 26px 28px; margin-bottom: 22px; box-shadow: var(--shadow);
+  }
+  @media (max-width: 600px) { .panel { padding: 20px 18px; } .wrap { padding: 24px 14px 40px; } }
+  .panel h2 { font-family: var(--serif); font-weight: 500; font-size: 22px; letter-spacing: -.005em; margin: 0 0 4px; }
+  .panel .sub { margin: 0 0 20px; color: var(--muted); font-size: 13.5px; max-width: 78ch; }
+  .row-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+  .row-head > div:first-child { flex: 1 1 320px; }
+
+  /* Form öğeleri */
+  input, select, textarea {
+    font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line-strong); border-radius: 8px; padding: 7px 10px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input[type=number] { width: 100%; }
+  input:hover, select:hover, textarea:hover { border-color: var(--faint); }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  input.invalid { border-color: var(--bad); background: var(--bad-soft); }
+  input:disabled { background: var(--sunken); color: var(--muted); }
+
+  button {
+    font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
+    border-radius: 8px; padding: 7px 14px; transition: background .15s, border-color .15s;
+  }
+  button:hover { border-color: var(--faint); background: var(--sunken); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  button.primary:hover { filter: brightness(1.08); background: var(--accent); }
+  button.link { border: 0; background: none; padding: 2px 5px; color: var(--accent); font-weight: 500; }
+  button.link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  button.link.danger { color: var(--bad); }
+  button.primary.danger { background: var(--bad); border-color: var(--bad); color: #fff; }
+  #ask p { margin: 0 0 6px; color: var(--muted); white-space: pre-line; }
+  button[disabled] { opacity: .45; cursor: not-allowed; }
+
+  /* Segment kontrol */
+  .seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--sunken); border: 1px solid var(--line); border-radius: 10px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; border-radius: 7px; padding: 5px 12px; color: var(--muted); }
+  .seg button:hover { background: transparent; color: var(--ink); }
+  .seg button[aria-pressed=true] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(20, 27, 38, .12); }
+
+  /* Hesaplayıcı */
+  .calc { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px; }
+  @media (max-width: 900px) { .calc { grid-template-columns: 1fr; } }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 14px; }
+  .fields label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 5px; }
+  .fields .full { grid-column: 1 / -1; }
+  .hint { font-size: 12px; color: var(--faint); }
+  .err { font-size: 13px; color: var(--bad); min-height: 20px; margin-top: 12px; }
+
+  .out { border-left: 1px solid var(--line); padding-left: 32px; }
+  @media (max-width: 900px) { .out { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 20px; } }
+  .out dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 18px; margin: 0 0 18px; }
+  .out dt { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .out dd { margin: 0; font-family: var(--serif); font-size: 22px; line-height: 1.15; }
+  .out dd.big { font-size: 40px; color: var(--accent); letter-spacing: -.01em; }
+  svg text { fill: var(--faint); font: 10px var(--sans); }
+
+  /* Ekip */
+  .team { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 4px 0 20px; }
+  .person {
+    display: flex; align-items: center; gap: 11px; text-align: left; width: 100%;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+  }
+  .person:hover { background: var(--sunken); }
+  .person[aria-pressed=true] { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .avatar {
+    flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    font-family: var(--serif); font-size: 14px; color: var(--accent-ink); background: var(--av, var(--accent));
+  }
+  .person .nm { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .person .ct { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  /* Liste */
+  .stats { display: flex; gap: 28px; flex-wrap: wrap; align-items: baseline; margin: 0 0 18px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stats span { font-size: 12.5px; color: var(--muted); }
+  .stats b { display: block; font-family: var(--serif); font-weight: 500; font-size: 26px; color: var(--ink); line-height: 1.1; }
+  .gate-ok b { color: var(--ok); }
+  .gate-bad b { color: var(--bad); }
+  .toolbar { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .toolbar .grp { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; white-space: nowrap; }
+  th { font-weight: 500; color: var(--muted); font-size: 12px; background: var(--sunken); }
+  tbody tr:hover td { background: var(--sunken); }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; }
+  td input[type=number] { width: 86px; text-align: right; padding: 4px 8px; border-radius: 6px; }
+  td.title, td.inputs { white-space: normal; min-width: 130px; max-width: 220px; }
+  td.title { font-weight: 500; }
+  td.title small { display: block; color: var(--faint); font-weight: 400; }
+  td.clone { color: var(--accent); font-weight: 600; }
+  td.acts { padding-left: 4px; }
+  td.acts .acts-grid { display: grid; grid-template-columns: auto auto; gap: 0 2px; justify-content: start; }
+  td.acts button { white-space: nowrap; font-size: 12.5px; text-align: left; }
+  th, td { padding: 10px 10px; }
+  td.title, td.inputs { max-width: 190px; }
+  .who { display: flex; align-items: center; gap: 8px; }
+  .who .avatar { width: 24px; height: 24px; font-size: 10.5px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.bad { background: var(--bad-soft); color: var(--bad); }
+  .badge.wait { background: var(--wait-soft); color: var(--wait); }
+  .empty { padding: 28px; text-align: center; color: var(--muted); }
+
+  /* Ajan */
+  .agent-row { display: flex; gap: 10px; }
+  .agent-row input { flex: 1; padding: 10px 14px; font-size: 14.5px; border-radius: 10px; }
+  .examples { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 0; }
+  .examples button { font-size: 12.5px; padding: 4px 12px; border-radius: 20px; color: var(--muted); }
+  .examples button:hover { color: var(--ink); }
+  .report { margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: var(--sunken); }
+  .report pre { white-space: pre-wrap; margin: 12px 0 0; font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 2px 10px; font-size: 12px; }
+  .chip.warn { border-color: var(--wait); color: var(--wait); }
+
+  /* Notlar */
+  .feed { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .obs { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; background: var(--surface); }
+  .obs .meta { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+  .obs .meta b { color: var(--accent); font-weight: 600; }
+
+  details.method summary { cursor: pointer; font-family: var(--serif); font-size: 18px; }
+  details.method table td { white-space: normal; }
+
+  dialog { border: 1px solid var(--line); border-radius: 16px; padding: 24px 26px; width: min(540px, 94vw); background: var(--surface); color: var(--ink); box-shadow: 0 30px 60px -20px rgba(0,0,0,.35); }
+  dialog::backdrop { background: rgba(12, 17, 25, .5); backdrop-filter: blur(2px); }
+  dialog h3 { margin: 0 0 18px; font-family: var(--serif); font-weight: 500; font-size: 22px; }
+  dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+
+  nav.jump { display: flex; gap: 4px 18px; flex-wrap: wrap; margin: -12px 0 24px; font-size: 13px; }
+  nav.jump a { color: var(--muted); text-decoration: none; padding: 2px 0; border-bottom: 1px solid transparent; }
+  nav.jump a:hover { color: var(--ink); border-bottom-color: var(--line-strong); }
+  .seg + .hint, .fields .hint.below { display: block; margin-top: 6px; line-height: 1.45; }
+  .howto { margin-top: 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunken); }
+  .howto summary { cursor: pointer; padding: 11px 14px; font-weight: 600; font-size: 13.5px; }
+  .howto ol { margin: 0; padding: 0 16px 14px 34px; font-size: 13px; color: var(--muted); columns: 2 340px; column-gap: 40px; }
+  .howto li { break-inside: avoid; }
+  .howto li { margin: 6px 0; }
+  .howto li b { color: var(--ink); font-weight: 600; }
+  .howto .cells { display: inline-grid; grid-template-columns: auto auto auto; gap: 2px 14px; margin: 6px 0 2px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; color: var(--ink); }
+  .howto .cells span:nth-child(-n+3) { color: var(--faint); font-size: 11.5px; }
+  .out-note { font-size: 12.5px; color: var(--muted); margin: -6px 0 14px; line-height: 1.5; }
+  .role { font-weight: 600; white-space: nowrap; }
+  .role.core { color: var(--accent); }
+  .role.anchor { color: var(--ok); }
+  .role.edge { color: var(--wait); }
+  .role.secondary, .role.extra { color: var(--muted); }
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 20px; margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+  .legend .badge { margin-bottom: 3px; }
+  .guide-body { margin-top: 18px; }
+  .guide-body h3 { font-family: var(--serif); font-weight: 500; font-size: 18px; margin: 0 0 10px; }
+  .guide-body p, .guide-body li { color: var(--muted); max-width: 80ch; }
+  .guide-body li { margin: 6px 0; }
+  .guide-body li b, .guide-body p b { color: var(--ink); }
+  .guide-body table td { white-space: normal; }
+  .guide-body ol, .guide-body ul { padding-left: 20px; margin: 0; }
+  footer.foot { color: var(--faint); font-size: 12px; text-align: center; margin-top: 8px; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px;
+    font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 50;
+  }
+  #toast.show { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { #toast, input, button { transition: none; } }
+  .sr { position: absolute; left: -9999px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="kicker">YZM301 Teardown Sprint · G*Power 3.1.9.7 temiz oda klonu</p>
+      <h1>χ² testleri: olumsallık tabloları ve yanıt oranları</h1>
+    </div>
+    <label class="tester">Test eden
+      <select id="tester"><option value="">Kişi seçin</option></select>
+    </label>
+  </header>
+
+  <nav class="jump" aria-label="Bölümler">
+    <a href="#h-calc">Hesaplayıcı</a><a href="#h-list">Karşılaştırma listesi</a><a href="#h-guide">Test rehberi</a><a href="#h-agent">Doğal dil ajanı</a><a href="#h-obs">Notlar</a>
+  </nav>
+
+  <!-- 1. Hesaplayıcı -->
+  <section class="panel" aria-labelledby="h-calc">
+    <div class="row-head">
+      <div>
+        <h2 id="h-calc">Hesaplayıcı</h2>
+        <p class="sub">G*Power'daki “Goodness-of-fit tests: Contingency tables” penceresiyle aynı girdileri kullanır. Sonucu listeye ekleyip G*Power'da okuduğunuz değeri yanına yazın.</p>
+      </div>
+      <button class="primary" id="calc-add">Bu hesabı listeye ekle</button>
+    </div>
+
+    <div class="calc">
+      <div>
+        <div class="fields">
+          <div class="full">
+            <label>Analiz türü</label>
+            <div class="seg" role="group" aria-label="Analiz türü">
+              <button type="button" data-mode="a-priori" aria-pressed="true">A priori (N hesapla)</button>
+              <button type="button" data-mode="post-hoc" aria-pressed="false">Post hoc (güç hesapla)</button>
+            </div>
+            <span class="hint" id="mode-hint"></span>
+          </div>
+          <div class="full">
+            <label>Etki büyüklüğü kaynağı</label>
+            <div class="seg" role="group" aria-label="Etki büyüklüğü kaynağı">
+              <button type="button" data-src="rates" aria-pressed="true">Yanıt oranlarından (2×2)</button>
+              <button type="button" data-src="w" aria-pressed="false">Doğrudan w</button>
+            </div>
+            <span class="hint" id="src-hint"></span>
+          </div>
+
+          <div class="src-rates"><label for="c-p1">Grup 1 yanıt oranı (%)</label><input type="number" id="c-p1" value="45" step="any" min="0" max="100"></div>
+          <div class="src-rates"><label for="c-p2">Grup 2 yanıt oranı (%)</label><input type="number" id="c-p2" value="25" step="any" min="0" max="100"></div>
+          <div class="src-rates full"><label for="c-a1">Grup 1 payı (%) <span class="hint">· Grup 2 = 100 − bu değer</span></label><input type="number" id="c-a1" value="50" step="any" min="1" max="99"></div>
+
+          <div class="src-w full" hidden><label for="c-w">Etki büyüklüğü w</label><input type="number" id="c-w" value="0.3" step="any" min="0.001" max="10"></div>
+
+          <div><label for="c-alpha">α hata olasılığı</label><input type="number" id="c-alpha" value="0.05" step="any"><span class="hint below">Yanlış pozitif riski; genelde 0.05.</span></div>
+          <div class="m-apriori"><label for="c-power">Hedef güç (1 − β)</label><input type="number" id="c-power" value="0.80" step="any"><span class="hint below">Gerçek farkı yakalama olasılığı; α'dan büyük olmalı.</span></div>
+          <div class="m-posthoc" hidden><label for="c-n">Toplam örneklem N</label><input type="number" id="c-n" value="120" step="1" min="2"><span class="hint below">Toplanmış ya da planlanan toplam katılımcı.</span></div>
+          <div><label for="c-df">Df <span class="hint">· (r−1)(c−1)</span></label><input type="number" id="c-df" value="1" step="1" min="1"><span class="hint below" id="df-hint"></span></div>
+        </div>
+        <div class="err" id="calc-err" role="alert"></div>
+      </div>
+
+      <div class="out">
+        <dl>
+          <div><dt>Etki büyüklüğü w</dt><dd id="o-w">–</dd></div>
+          <div><dt>Merkezi olmama λ</dt><dd id="o-lambda">–</dd></div>
+          <div><dt>Kritik χ²</dt><dd id="o-crit">–</dd></div>
+          <div><dt>Toplam örneklem N</dt><dd class="big" id="o-n">–</dd></div>
+          <div><dt>Grup dağılımı</dt><dd id="o-groups">–</dd></div>
+          <div><dt>Gerçekleşen güç</dt><dd class="big" id="o-power">–</dd></div>
+        </dl>
+        <p class="out-note" id="out-note"></p>
+        <svg id="curve" viewBox="0 0 540 190" role="img" aria-label="N'e göre güç eğrisi" style="width: 100%; height: auto; display: block; touch-action: none;">
+          <g id="grid"></g>
+          <line id="target-line" x1="44" x2="528" stroke="var(--wait)" stroke-dasharray="4 3"/>
+          <path id="curve-path" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <line id="guide" stroke="var(--faint)" stroke-dasharray="2 2"/>
+          <circle id="knob" r="5.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" style="cursor: ns-resize;"/>
+          <text x="44" y="184" id="ax-min"></text>
+          <text x="528" y="184" text-anchor="end" id="ax-max"></text>
+          <text x="286" y="184" text-anchor="middle">Toplam N</text>
+        </svg>
+        <p class="hint" style="margin: 4px 0 0;">A priori modda eğri üzerinde dikey sürükleyerek hedef gücü değiştirebilirsiniz.</p>
+      </div>
+    </div>
+    <details class="howto" id="howto">
+      <summary>Bu senaryoyu G*Power'da nasıl ölçerim?</summary>
+      <ol id="howto-steps"></ol>
+    </details>
+  </section>
+
+  <!-- 2. Doğrulama listesi -->
+  <section class="panel" aria-labelledby="h-list">
+    <h2 id="h-list">G*Power karşılaştırma listesi</h2>
+    <p class="sub">Klon değerleri otomatik hesaplanır. “G*Power N” ve “G*Power güç” sütunlarına G*Power penceresinde okuduğunuz değeri yazın; durum anında güncellenir.</p>
+
+    <div class="team" id="team" role="group" aria-label="Test edene göre filtre"></div>
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <div class="grp">
+        <div class="seg" role="group" aria-label="Duruma göre filtre" id="filters">
+          <button type="button" data-f="all" aria-pressed="true">Tümü</button>
+          <button type="button" data-f="ok" aria-pressed="false">Uyumlu</button>
+          <button type="button" data-f="bad" aria-pressed="false">Sapma</button>
+          <button type="button" data-f="wait" aria-pressed="false">Bekleyen</button>
+        </div>
+        
+      </div>
+      <div class="grp">
+        <button class="primary" id="btn-new">Yeni ölçüm ekle</button>
+        <button id="btn-csv">CSV indir</button>
+        <button id="btn-json">JSON indir</button>
+        <button id="btn-import">JSON yükle</button>
+        <input type="file" id="file-import" accept=".json,application/json" hidden>
+        <button class="link" id="btn-reset">Örnek verilere dön</button>
+        <button class="link danger" id="btn-clear">Tümünü sil</button>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Senaryo</th><th>Girdiler</th><th class="num">df</th>
+            <th class="num">Klon N</th><th class="num">G*Power N</th>
+            <th class="num">Klon güç</th><th class="num">G*Power güç</th>
+            <th>Durum</th><th>Test eden</th><th><span class="sr">İşlemler</span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <div><span class="badge ok">Uyumlu</span><br>İstenen sonuç. A priori'de N birebir aynı ve güç farkı ±0.0005 içinde; post hoc'ta güç farkı ±0.0005 içinde.</div>
+      <div><span class="badge bad">Sapma</span><br>İstenmeyen sonuç. Önce G*Power'a aynı girdileri, doğru menüden verdiğinizi kontrol edin; hâlâ farklıysa satıra not ekleyin.</div>
+      <div><span class="badge wait">Bekliyor</span><br>G*Power'da henüz ölçülmedi. Teslimden önce bu sayı sıfıra inmeli. %90 kapısı yalnızca ölçülmüş satırlardan hesaplanır.</div>
+    </div>
+  </section>
+
+  <!-- Test rehberi -->
+  <section class="panel" aria-labelledby="h-guide">
+    <h2 id="h-guide">Test rehberi</h2>
+    <p class="sub">Ölçüme başlamadan önce okuyun. Değerlerin anlamı, hangi senaryoyu neden test ettiğimiz ve G*Power'da ölçüm adımları.</p>
+    <div class="seg" role="tablist" aria-label="Rehber bölümleri" id="guide-tabs">
+      <button type="button" role="tab" data-g="values" aria-pressed="true">Değerler</button>
+      <button type="button" role="tab" data-g="scen" aria-pressed="false">Senaryolar</button>
+      <button type="button" role="tab" data-g="avoid" aria-pressed="false">İstemediğimiz durumlar</button>
+      <button type="button" role="tab" data-g="steps" aria-pressed="false">G*Power adımları</button>
+    </div>
+
+    <div class="guide-body" data-gp="values">
+      <h3>Değerler ne anlama geliyor</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Değer</th><th>Anlamı</th></tr></thead>
+          <tbody>
+            <tr><td>Klon N, Klon güç</td><td>Bizim motorun hesapladığı değer. Girdilerden otomatik çıkar, elle değiştirilmez.</td></tr>
+            <tr><td>G*Power N, G*Power güç</td><td>Aynı girdiler G*Power 3.1.9.7'ye girilince pencerede okunan “Total sample size” ve “Actual power”. Test eden kişi kendisi yazar; klondan kopyalanmaz.</td></tr>
+            <tr><td>Etki büyüklüğü w</td><td>Gruplar arasındaki farkın standart ölçüsü. Cohen'e göre 0.1 küçük, 0.3 orta, 0.5 büyük etkidir. Yanıt oranlarından da türetilebilir (SPEC R-02).</td></tr>
+            <tr><td>Kritik χ²</td><td>Test istatistiği bu değeri aşarsa sonuç anlamlı sayılır. Yalnızca α ve df'ye bağlıdır (α = 0.05, df = 1 için 3.8415).</td></tr>
+            <tr><td>Merkezi olmama λ</td><td>λ = w² × N. Etki ve örneklem büyüdükçe λ ve dolayısıyla güç artar.</td></tr>
+            <tr><td>Gerçekleşen güç</td><td>Bulunan tamsayı N ile ulaşılan güç. N yukarı yuvarlandığı için hedeften biraz yüksek çıkar (0.80 hedefinde 0.8035 gibi).</td></tr>
+            <tr><td>Grup dağılımı</td><td>Toplam N'in Grup 1 payına göre bölünmesi (eşit payda 179 → 90 / 89).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="guide-body" data-gp="scen" hidden>
+      <h3>Hangi senaryoyu neden test ediyoruz</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Ne test ediyor</th><th>Rol</th><th>Neden</th><th></th></tr></thead>
+          <tbody id="guide-scen"></tbody>
+        </table>
+      </div>
+      <p class="hint" style="margin-top: 10px;">Rol etiketleri listede senaryo adının altında da görünür. Sizin eklediğiniz satırlar girdilerine göre otomatik etiketlenir.</p>
+    </div>
+
+    <div class="guide-body" data-gp="avoid" hidden>
+      <h3>İstemediğimiz durumlar</h3>
+      <ul>
+        <li><b>Klondan kopyalanmış G*Power değeri.</b> Klon kendisiyle karşılaştırılmış olur ve hiçbir şey kanıtlamaz. G*Power sütununa yalnızca G*Power penceresinde okunan değeri yazın.</li>
+        <li><b>Yanlış G*Power menüsü.</b> “Proportions: Difference between two independent proportions” ya da Fisher's exact testi farklı bir test ailesidir ve farklı N verir. Bu sonuç sapma görünür ama klonun hatası değildir.</li>
+        <li><b>Eşit yanıt oranları (p₁ = p₂).</b> w = 0 olur, yani test edilecek bir fark yoktur. Arayüz reddeder.</li>
+        <li><b>α'dan küçük ya da eşit hedef güç.</b> G*Power “Power must be greater than alpha” uyarısı verir; klon da aynı şekilde reddeder (LEDGER #05). Bu reddetme kendi başına doğru bir davranıştır.</li>
+        <li><b>%0 veya %100 yanıt oranı, tamsayı olmayan df, 0.001–10 aralığı dışında w.</b> SPEC R-01'e göre geçersiz girdilerdir.</li>
+        <li><b>2×2 tabloda Df'nin 1'den farklı girilmesi.</b> İki grup × iki sonuçta df = (2−1)(2−1) = 1'dir. G*Power'da yanlış df girilirse N değişir.</li>
+      </ul>
+    </div>
+
+    <div class="guide-body" data-gp="steps" hidden>
+      <h3>G*Power'da ölçüm adımları</h3>
+      <ol>
+        <li><b>Test family:</b> χ² tests</li>
+        <li><b>Statistical test:</b> Goodness-of-fit tests: Contingency tables</li>
+        <li><b>Type of power analysis:</b> A priori (N için) ya da Post hoc (güç için)</li>
+        <li><b>Effect size w:</b> Doğrudan w varsa yazın. Yanıt oranlarından geliyorsa “Determine” penceresinde 4 hücre için H1 olasılıklarını (gözlenen) ve H0 olasılıklarını (bağımsızlıkta beklenen) girip “Calculate and transfer” deyin. Her senaryonun hücre değerleri hesaplayıcıdaki “Bu senaryoyu G*Power'da nasıl ölçerim?” kutusunda hazır.</li>
+        <li><b>α err prob, Power ya da Total sample size, Df</b> alanlarını doldurun; Df'nin doğru olduğundan emin olun.</li>
+        <li><b>Calculate</b> deyin; “Total sample size” ve “Actual power” değerlerini listede ilgili satırın G*Power sütunlarına yazın.</li>
+        <li>Sonuç sapma çıkarsa satırdaki <b>Not</b> ile ne gözlediğinizi yazın; bu notlar LEDGER'a REA kanıtı olarak taşınabilir.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 3. Doğal dil ajanı -->
+  <section class="panel" aria-labelledby="h-agent">
+    <h2 id="h-agent">Doğal dil ajanı</h2>
+    <p class="sub">Soruyu Türkçe ya da İngilizce yazın; ajan parametreleri çıkarır, aynı motorla hesaplar ve protokol metni üretir. Komut satırı karşılığı: <code>python src/chi2power/agent.py</code></p>
+    <div class="agent-row">
+      <input type="text" id="agent-q" placeholder="Örn: Grup 1 yanıt oranı %25, Grup 2 %45, alfa 0.05, hedef güç 0.85 için kaç hasta gerekir?">
+      <button class="primary" id="agent-run">Çalıştır</button>
+    </div>
+    <div class="examples">
+      <button type="button" data-q="Grup 1'de beklenen yanıt oranı %30, Grup 2'de %50. Alfa 0.05 ve %80 hedef güç için kaç hasta gerekir?">%30 ve %50 yanıt oranı</button>
+      <button type="button" data-q="Cohen w=0.30, alfa 0.05 ve %85 güç için serbestlik derecesi 1 olan ki-kare testinde kaç denek lazım?">w = 0.30, güç %85</button>
+      <button type="button" data-q="Post-hoc analiz: 120 denek topladık, etki büyüklüğü w=0.25 ve alpha=0.05 iken elde ettiğimiz güç nedir?">Post hoc, 120 denek</button>
+      <button type="button" data-q="3x3 olumsallık tablosunda w=0.20, alfa=0.01 ve %90 güç için örneklem boyutu nedir?">3×3 tablo (df = 4)</button>
+    </div>
+    <div class="report" id="agent-out" hidden>
+      <div class="row-head">
+        <div class="chips" id="agent-chips"></div>
+        <div style="display: flex; gap: 6px;">
+          <button id="agent-to-calc">Hesaplayıcıya aktar</button>
+          <button id="agent-to-list">Listeye ekle</button>
+        </div>
+      </div>
+      <pre id="agent-text"></pre>
+    </div>
+  </section>
+
+  <!-- 4. Gözlemler -->
+  <section class="panel" aria-labelledby="h-obs">
+    <div class="row-head" style="margin-bottom: 10px;">
+      <h2 id="h-obs" style="margin: 0;">Gözlem ve REA notları</h2>
+      <button id="btn-obs">Genel not ekle</button>
+    </div>
+    <div class="feed" id="feed"></div>
+  </section>
+
+  <!-- 5. Yöntem -->
+  <section class="panel">
+    <details class="method">
+      <summary>Yöntem özeti (SPEC 1.0)</summary>
+      <div class="tbl-wrap" style="margin-top: 10px;">
+        <table>
+          <thead><tr><th>Bileşen</th><th>Tanım</th><th>G*Power davranışı</th></tr></thead>
+          <tbody>
+            <tr><td>Etki büyüklüğü (R-02)</td><td>w = √Σ (p<sub>ij</sub> − E<sub>ij</sub>)² / E<sub>ij</sub>, E<sub>ij</sub> = R<sub>i</sub>·C<sub>j</sub>; hücreler p₁₁ = a₁p₁, p₁₂ = a₁(1 − p₁), p₂₁ = a₂p₂, p₂₂ = a₂(1 − p₂)</td><td>Determine penceresi hücre olasılıklarından w türetir [DOK]</td></tr>
+            <tr><td>Kritik değer (R-03)</td><td>χ²<sub>kritik</sub> = F⁻¹(1 − α; df), merkezi χ²</td><td>[DOK]</td></tr>
+            <tr><td>Güç (R-04, R-05)</td><td>λ = w²·N; güç = 1 − F<sub>χ²,λ</sub>(χ²<sub>kritik</sub>; df, λ), Poisson ağırlıklı seri</td><td>LEDGER #01 [REA]</td></tr>
+            <tr><td>Örneklem (R-06)</td><td>Güç(N) ≥ 1 − β koşulunu sağlayan en küçük tamsayı N, N = 2'den başlayan tamsayı arama</td><td>LEDGER #02 [REA]</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <footer class="foot">Şevval Sunar · Arda Erdem · Sıla Çördük · Kübra Başımoğlu</footer>
+</div>
+
+<!-- Ölçüm ekle / düzenle -->
+<dialog id="dlg">
+  <form method="dialog" id="dlg-form">
+    <h3 id="dlg-title">Yeni G*Power ölçümü</h3>
+    <div class="fields">
+      <div class="full"><label for="d-researcher">Ölçümü yapan</label><select id="d-researcher" style="width: 100%;"></select></div>
+      <div><label for="d-id">Test ID</label><input type="text" id="d-id"></div>
+      <div><label for="d-title">Senaryo</label><input type="text" id="d-title" placeholder="Örn: Onkoloji yanıt oranı"></div>
+      <div class="full">
+        <label>Analiz türü</label>
+        <select id="d-mode" style="width: 100%;"><option value="a-priori">A priori (N hesapla)</option><option value="post-hoc">Post hoc (güç hesapla)</option></select><span class="hint below">G*Power'da seçtiğiniz “Type of power analysis” ile aynı olmalı.</span>
+      </div>
+      <div class="full">
+        <label>Etki büyüklüğü kaynağı</label>
+        <select id="d-src" style="width: 100%;"><option value="rates">Yanıt oranlarından (2×2)</option><option value="w">Doğrudan w</option></select><span class="hint below">Yanıt oranlarında df otomatik olarak 1 olur.</span>
+      </div>
+      <div class="d-rates"><label for="d-p1">Grup 1 yanıt oranı (%)</label><input type="number" id="d-p1" step="any" value="45"></div>
+      <div class="d-rates"><label for="d-p2">Grup 2 yanıt oranı (%)</label><input type="number" id="d-p2" step="any" value="25"></div>
+      <div class="d-rates full"><label for="d-a1">Grup 1 payı (%)</label><input type="number" id="d-a1" step="any" value="50"></div>
+      <div class="d-w full" hidden><label for="d-w">w</label><input type="number" id="d-w" step="any" value="0.3"></div>
+      <div><label for="d-alpha">α</label><input type="number" id="d-alpha" step="any" value="0.05"></div>
+      <div class="d-apriori"><label for="d-power">Hedef güç</label><input type="number" id="d-power" step="any" value="0.80"></div>
+      <div class="d-posthoc" hidden><label for="d-n">Toplam N</label><input type="number" id="d-n" step="1" value="120"></div>
+      <div><label for="d-df">df</label><input type="number" id="d-df" step="1" value="1"></div>
+      <div class="d-apriori"><label for="d-gpn">G*Power'da okunan N</label><input type="number" id="d-gpn" step="1" placeholder="Boş = bekliyor"><span class="hint below">Pencerede “Total sample size”.</span></div>
+      <div><label for="d-gpp">G*Power'da okunan güç</label><input type="number" id="d-gpp" step="any" placeholder="Örn: 0.8035"><span class="hint below">Pencerede “Actual power”. Klondan kopyalamayın.</span></div>
+      <div class="full"><label for="d-note">Not</label><textarea id="d-note" rows="2" style="width: 100%;"></textarea></div>
+    </div>
+    <div class="err" id="dlg-err" role="alert"></div>
+    <div class="actions">
+      <button type="button" id="dlg-cancel">Vazgeç</button>
+      <button type="button" class="primary" id="dlg-save">Kaydet</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Onay / metin penceresi (tarayıcının confirm/prompt kutuları yerine; VS Code önizlemesinde bunlar engellenir) -->
+<dialog id="ask">
+  <h3 id="ask-title"></h3>
+  <p id="ask-msg"></p>
+  <textarea id="ask-text" rows="3" style="width: 100%;" hidden></textarea>
+  <div class="actions">
+    <button type="button" id="ask-no">Vazgeç</button>
+    <button type="button" class="primary" id="ask-yes">Tamam</button>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   1. HESAP MOTORU (SPEC R-02 … R-06)
+   ===================================================================== */
+const Engine = (() => {
+  const LANCZOS = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+    771.32342877765313, -176.61502916214059, 12.507343278686905,
+    -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+
+  function logGamma(x) {
+    if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - logGamma(1 - x);
+    x -= 1;
+    let a = LANCZOS[0];
+    const t = x + 7.5;
+    for (let i = 1; i < 9; i++) a += LANCZOS[i] / (x + i);
+    return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+  }
+
+  // Düzenlenmiş alt tamamlanmamış gama P(a, x)
+  function gammaP(a, x) {
+    if (x <= 0) return 0;
+    const lnPre = -x + a * Math.log(x) - logGamma(a);
+    if (x < a + 1) {
+      let sum = 1 / a, term = sum;
+      for (let n = 1; n < 5000; n++) {
+        term *= x / (a + n);
+        sum += term;
+        if (term < sum * 1e-16) break;
+      }
+      return Math.min(1, sum * Math.exp(lnPre));
+    }
+    // Sürekli kesir (Lentz) ile Q(a, x)
+    let b = x + 1 - a, c = 1e300, d = 1 / b, h = d;
+    for (let i = 1; i < 5000; i++) {
+      const an = -i * (i - a);
+      b += 2;
+      d = an * d + b; if (Math.abs(d) < 1e-300) d = 1e-300;
+      c = b + an / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+      d = 1 / d;
+      const del = d * c;
+      h *= del;
+      if (Math.abs(del - 1) < 1e-16) break;
+    }
+    return Math.max(0, 1 - Math.exp(lnPre) * h);
+  }
+
+  const chi2Cdf = (x, df) => (x <= 0 ? 0 : gammaP(df / 2, x / 2));
+  const chi2Pdf = (x, df) => (x <= 0 ? 0 :
+    Math.exp((df / 2 - 1) * Math.log(x) - x / 2 - (df / 2) * Math.LN2 - logGamma(df / 2)));
+
+  // Merkezi χ² kuantili: köşeleme + Newton (yedek: ikiye bölme), 1e-12
+  function chi2Inv(p, df) {
+    let lo = 0, hi = Math.max(1, df);
+    while (chi2Cdf(hi, df) < p) { lo = hi; hi *= 2; }
+    let x = (lo + hi) / 2;
+    for (let i = 0; i < 200; i++) {
+      const f = chi2Cdf(x, df) - p;
+      if (Math.abs(f) < 1e-14) break;
+      if (f < 0) lo = x; else hi = x;
+      const pdf = chi2Pdf(x, df);
+      let nx = pdf > 0 ? x - f / pdf : NaN;
+      if (!(nx > lo && nx < hi)) nx = (lo + hi) / 2;
+      if (Math.abs(nx - x) < 1e-12 * Math.max(1, x)) { x = nx; break; }
+      x = nx;
+    }
+    return x;
+  }
+
+  // Merkezi olmayan χ² CDF: Poisson ağırlıklı seri (LEDGER #01).
+  // Toplama Poisson modundan başlayıp iki yöne ilerler; büyük λ'da da kararlı.
+  function ncx2Cdf(x, df, lambda) {
+    if (x <= 0) return 0;
+    if (lambda <= 0) return chi2Cdf(x, df);
+    const m = lambda / 2;
+    const k0 = Math.floor(m);
+    const logW = (k) => -m + k * Math.log(m) - logGamma(k + 1);
+    let sum = 0;
+    for (let k = k0; ; k++) {
+      const w = Math.exp(logW(k));
+      const term = w * chi2Cdf(x, df + 2 * k);
+      sum += term;
+      if ((k > k0 + 5 && w < 1e-17) || term < 1e-17 * Math.max(sum, 1e-300) && k > k0 + 5) break;
+      if (k - k0 > 100000) break;
+    }
+    for (let k = k0 - 1; k >= 0; k--) {
+      const w = Math.exp(logW(k));
+      sum += w * chi2Cdf(x, df + 2 * k);
+      if (w < 1e-17) break;
+    }
+    return Math.min(1, Math.max(0, sum));
+  }
+
+  // R-02: yanıt oranlarından w
+  function deriveW(p1, p2, a1 = 0.5) {
+    const a2 = 1 - a1;
+    const cells = [a1 * p1, a1 * (1 - p1), a2 * p2, a2 * (1 - p2)];
+    const C1 = cells[0] + cells[2], C2 = cells[1] + cells[3];
+    const E = [a1 * C1, a1 * C2, a2 * C1, a2 * C2];
+    let s = 0;
+    for (let i = 0; i < 4; i++) if (E[i] > 0) s += (cells[i] - E[i]) ** 2 / E[i];
+    return Math.sqrt(s);
+  }
+
+  const powerAt = (w, n, crit, df) => 1 - ncx2Cdf(crit, df, w * w * n);
+
+  const N_MAX = 10000000;
+  // R-06: güç(N) ≥ hedef koşulunu sağlayan en küçük tamsayı N (N = 2'den başlar)
+  function apriori(w, alpha, target, df) {
+    const crit = chi2Inv(1 - alpha, df);
+    let lo = 2, hi = 2;
+    if (powerAt(w, 2, crit, df) >= target) {
+      return { N: 2, crit, lambda: w * w * 2, power: powerAt(w, 2, crit, df), capped: false };
+    }
+    while (powerAt(w, hi, crit, df) < target) {
+      lo = hi + 1; hi *= 2;
+      if (hi > N_MAX) return { N: null, crit, lambda: NaN, power: NaN, capped: true };
+    }
+    while (lo < hi) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (powerAt(w, mid, crit, df) >= target) hi = mid; else lo = mid + 1;
+    }
+    return { N: lo, crit, lambda: w * w * lo, power: powerAt(w, lo, crit, df), capped: false };
+  }
+
+  function posthoc(w, n, alpha, df) {
+    const crit = chi2Inv(1 - alpha, df);
+    return { N: n, crit, lambda: w * w * n, power: powerAt(w, n, crit, df), capped: false };
+  }
+
+  // R-01 doğrulaması. Girdiler: oranlar 0–1 aralığında.
+  function validate(s) {
+    const e = [];
+    if (s.src === 'rates') {
+      if (!(s.p1 > 0 && s.p1 < 1)) e.push('Grup 1 yanıt oranı 0 ile 100 arasında olmalı (uçlar hariç).');
+      if (!(s.p2 > 0 && s.p2 < 1)) e.push('Grup 2 yanıt oranı 0 ile 100 arasında olmalı (uçlar hariç).');
+      if (!(s.a1 > 0 && s.a1 < 1)) e.push('Grup 1 payı 0 ile 100 arasında olmalı (uçlar hariç).');
+      if (!e.length && Math.abs(s.p1 - s.p2) < 1e-12) e.push('İki grubun yanıt oranı eşit: w = 0, yani test edilecek bir fark yok.');
+    } else if (!(s.w >= 0.001 && s.w <= 10)) e.push('w 0.001 ile 10 arasında olmalı.');
+    if (!(s.alpha > 1e-7 && s.alpha < 1)) e.push('α 0.0000001 ile 1 arasında olmalı.');
+    if (!(Number.isInteger(s.df) && s.df >= 1)) e.push('df 1 veya daha büyük bir tamsayı olmalı.');
+    if (s.mode === 'a-priori') {
+      if (!(s.power > 0 && s.power < 1)) e.push('Hedef güç 0 ile 1 arasında olmalı.');
+      else if (s.alpha < 1 && s.power <= s.alpha) e.push('Hedef güç α değerinden büyük olmalı (G*Power: “Power must be greater than alpha”).');
+    } else if (!(Number.isInteger(s.n) && s.n >= 2)) e.push('Toplam N en az 2 olan bir tamsayı olmalı.');
+    return e;
+  }
+
+  // Tek giriş noktası: tezgah, liste ve ajan hepsi bunu çağırır.
+  function run(s) {
+    const errors = validate(s);
+    if (errors.length) return { errors };
+    const w = s.src === 'rates' ? deriveW(s.p1, s.p2, s.a1) : s.w;
+    if (w < 0.001) return { errors: ['Türetilen w çok küçük (< 0.001). Oranları kontrol edin.'] };
+    const r = s.mode === 'a-priori' ? apriori(w, s.alpha, s.power, s.df) : posthoc(w, s.n, s.alpha, s.df);
+    if (r.capped) return { errors: [`Gereken N ${N_MAX.toLocaleString('tr-TR')} değerini aşıyor; etki çok küçük.`] };
+    const a1 = s.src === 'rates' ? s.a1 : 0.5;
+    const n1 = Math.round(r.N * a1);
+    return { errors: [], w, ...r, n1, n2: r.N - n1 };
+  }
+
+  function cells(p1, p2, a1 = 0.5) {
+    const a2 = 1 - a1;
+    const obs = [a1 * p1, a1 * (1 - p1), a2 * p2, a2 * (1 - p2)];
+    const C1 = obs[0] + obs[2], C2 = obs[1] + obs[3];
+    return { obs, exp: [a1 * C1, a1 * C2, a2 * C1, a2 * C2] };
+  }
+  return { run, deriveW, cells, chi2Inv, ncx2Cdf, powerAt };
+})();
+
+/* =====================================================================
+   2. YARDIMCILAR
+   ===================================================================== */
+const $ = (id) => document.getElementById(id);
+const num = (id) => { const v = $(id).value.trim().replace(',', '.'); return v === '' ? NaN : Number(v); };
+const fmt = (x, d = 4) => (Number.isFinite(x) ? x.toFixed(d) : '–');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const now = () => new Date().toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const pct = (p) => (Number.isFinite(p) ? +(p * 100).toFixed(4) : '');
+let toastTimer;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function ask({ title, msg = '', ok = 'Tamam', danger = false, input = false, value = '' }) {
+  const d = $('ask'), yes = $('ask-yes'), no = $('ask-no'), ta = $('ask-text');
+  $('ask-title').textContent = title; $('ask-msg').textContent = msg;
+  yes.textContent = ok; yes.classList.toggle('danger', danger);
+  ta.hidden = !input; ta.value = value;
+  return new Promise((resolve) => {
+    const done = (val) => { yes.onclick = no.onclick = d.oncancel = null; d.close(); resolve(val); };
+    yes.onclick = () => done(input ? ta.value.trim() : true);
+    no.onclick = () => done(input ? null : false);
+    d.oncancel = (e) => { e.preventDefault(); done(input ? null : false); };
+    d.showModal();
+    (input ? ta : no).focus();
+  });
+}
+function download(name, text, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function tester() { return $('tester').value.trim(); }
+function requireTester() {
+  if (tester()) return tester();
+  toast('Önce sağ üstteki “Test eden” listesinden kendinizi seçin.');
+  $('tester').focus();
+  return null;
+}
+
+/* =====================================================================
+   3. KALICI VERİ (localStorage)
+   ===================================================================== */
+const DB_KEY = 'gpower:chi2:db:v5';
+const OLD_KEYS = ['gpower:chi2:db:v4', 'gpower:chi2:db:v3'];
+const TEAM = ['Şevval Sunar', 'Arda Erdem', 'Sıla Çördük', 'Kübra Başımoğlu'];
+const TEAM_COLORS = ['#1b4b5e', '#7a4b2a', '#4b5b2a', '#5a3d6b'];
+// Eski örnek verilerdeki yer tutucu isimler ekip üyelerine eşlenir
+const NAME_MAP = { 'G*Power kılavuzu': 'Şevval Sunar', 'G*Power Kılavuzu': 'Şevval Sunar', 'Ahmet Karaca': 'Arda Erdem', 'Zeynep Kaya': 'Sıla Çördük', 'Klon kontrolü': 'Şevval Sunar' };
+const mapName = (n) => NAME_MAP[n] ?? n;
+const initials = (n) => String(n || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0].toLocaleUpperCase('tr-TR')).join('');
+const colorOf = (n) => { const i = TEAM.indexOf(n); return i >= 0 ? TEAM_COLORS[i] : '#6b7280'; };
+const avatar = (n) => `<span class="avatar" style="--av:${colorOf(n)}" aria-hidden="true">${esc(initials(n))}</span>`;
+
+// G*Power değerleri yalnızca G*Power penceresinde okunmuş olanlardır.
+// C07 ve C08: SPEC'teki w = 0.2132 / N = 173 ve w = 0.1770 / N = 251 değerleri
+// R-02 formülüyle tutarsız (formül 0.2097 / 0.1796 verir). G*Power'da yeniden ölçülmeli.
+// Senaryo rolleri: ne test ettiği ve neden önemli olduğu
+const ROLES = {
+  core:      { label: 'Çekirdek', why: 'Teslim ettiğimiz iz tam olarak bu: yanıt oranlarından w türetip N bulmak. Mutlaka ölçülmeli.' },
+  anchor:    { label: 'Ana çıpa', why: 'G*Power\'ın en bilinen örneği. Bu tutmazsa motorun temeli hatalıdır.' },
+  edge:      { label: 'Sınır testi', why: 'Çok büyük ya da çok küçük N ve farklı güç hedeflerinde tamsayı aramanın doğru çalıştığını gösterir.' },
+  secondary: { label: 'İkincil', why: 'Olumsallık tablosu ailesinde ama yanıt oranı değil; df > 1 durumunun da doğru hesaplandığını kanıtlar.' },
+  extra:     { label: 'Ek senaryo', why: 'Ekibin eklediği ek kontrol.' }
+};
+const SCEN_WHAT = {
+  C01: 'w = 0.30, df = 1, standart orta etki', C02: 'Küçük etki (w = 0.1), büyük N', C03: 'Büyük etki (w = 0.5), küçük N',
+  C04: '2×3 tablo (df = 2)', C05: '3×3 tablo (df = 4)', C06: 'Hedef güç %95',
+  C07: '2×2, yanıt oranları %45 ve %25', C08: '2×2, nadir yanıt oranları %30 ve %15'
+};
+const SEED_ROLES = { C01: 'anchor', C02: 'edge', C03: 'edge', C04: 'secondary', C05: 'secondary', C06: 'edge', C07: 'core', C08: 'core' };
+function roleOf(v) {
+  if (v.role && ROLES[v.role]) return v.role;
+  if (v.src === 'rates') return 'core';
+  if (v.df > 1) return 'secondary';
+  return 'extra';
+}
+const SEED = [
+  { id: 'C01', title: 'Standart orta etki', mode: 'a-priori', src: 'w', w: 0.30, alpha: 0.05, power: 0.80, df: 1, gp_n: 88, gp_power: 0.8035, researcher: 'Şevval Sunar', time: '23.10.2026 21:00', note: 'Temel referans çıpası' },
+  { id: 'C02', title: 'Küçük etki', mode: 'a-priori', src: 'w', w: 0.10, alpha: 0.05, power: 0.80, df: 1, gp_n: 785, gp_power: 0.8001, researcher: 'Arda Erdem', time: '23.10.2026 21:15', note: '' },
+  { id: 'C03', title: 'Büyük etki', mode: 'a-priori', src: 'w', w: 0.50, alpha: 0.05, power: 0.80, df: 1, gp_n: 32, gp_power: 0.8074, researcher: 'Sıla Çördük', time: '23.10.2026 21:30', note: '' },
+  { id: 'C04', title: '2×3 tablo', mode: 'a-priori', src: 'w', w: 0.30, alpha: 0.05, power: 0.80, df: 2, gp_n: 108, gp_power: 0.8037, researcher: 'Kübra Başımoğlu', time: '23.10.2026 21:40', note: '' },
+  { id: 'C05', title: '3×3 tablo', mode: 'a-priori', src: 'w', w: 0.30, alpha: 0.05, power: 0.80, df: 4, gp_n: 133, gp_power: 0.8013, researcher: 'Şevval Sunar', time: '23.10.2026 21:55', note: '' },
+  { id: 'C06', title: 'Yüksek güç hedefi (%95)', mode: 'a-priori', src: 'w', w: 0.30, alpha: 0.05, power: 0.95, df: 1, gp_n: 145, gp_power: 0.9506, researcher: 'Arda Erdem', time: '23.10.2026 22:10', note: '' },
+  { id: 'C07', title: 'Klinik yanıt oranı %45 – %25', mode: 'a-priori', src: 'rates', p1: 0.45, p2: 0.25, a1: 0.5, alpha: 0.05, power: 0.80, df: 1, gp_n: null, gp_power: null, researcher: 'Sıla Çördük', time: '23.10.2026 22:25', note: 'Yeniden ölçülmeli: SPEC\'teki w = 0.2132 / N = 173 değeri R-02 formülüyle tutarsız.' },
+  { id: 'C08', title: 'Nadir yanıt oranı %30 – %15', mode: 'a-priori', src: 'rates', p1: 0.30, p2: 0.15, a1: 0.5, alpha: 0.05, power: 0.80, df: 1, gp_n: null, gp_power: null, researcher: 'Kübra Başımoğlu', time: '23.10.2026 22:40', note: 'Yeniden ölçülmeli: SPEC\'teki w = 0.1770 / N = 251 değeri R-02 formülüyle tutarsız.' }
+];
+const SEED_OBS = [
+  { vectorId: 'C01', author: 'Şevval Sunar', time: '23.10.2026 21:05', text: 'G*Power 3.1.9.7\'de w = 0.30 için N = 88 okundu; klon da 88 buluyor.' },
+  { vectorId: 'C07, C08', author: 'Şevval Sunar', time: '24.10.2026', text: 'SPEC\'teki C07 (w = 0.2132, N = 173) ve C08 (w = 0.1770, N = 251) değerleri R-02 formülüyle tutarsız; formül 0.2097 / 179 ve 0.1796 / 244 verir. Bu iki çıpayı G*Power Determine penceresinde yeniden ölçün.' }
+];
+
+// Eski (v3) kayıtları yeni şemaya taşır
+function normalize(v) {
+  const hasRates = v.p1 != null && v.p2 != null;
+  return {
+    id: String(v.id ?? ''), title: String(v.title ?? ''),
+    mode: v.mode === 'post-hoc' ? 'post-hoc' : 'a-priori',
+    src: v.src ?? (hasRates ? 'rates' : 'w'),
+    p1: hasRates ? Number(v.p1) : null, p2: hasRates ? Number(v.p2) : null,
+    a1: v.a1 != null ? Number(v.a1) : 0.5,
+    w: v.w != null ? Number(v.w) : null,
+    alpha: Number(v.alpha ?? 0.05), power: Number(v.power ?? 0.8),
+    n: v.n != null ? Number(v.n) : null, df: parseInt(v.df ?? 1, 10),
+    gp_n: v.gp_n == null || v.gp_n === '' ? null : Number(v.gp_n),
+    gp_power: v.gp_power == null || v.gp_power === '' ? null : Number(v.gp_power),
+    researcher: mapName(v.researcher ?? ''), time: v.time ?? '', note: v.note ?? '',
+    role: v.role ?? (SEED_ROLES[v.id] && SEED.some((x) => x.id === v.id && x.title === v.title) ? SEED_ROLES[v.id] : undefined)
+  };
+}
+
+let db = { vectors: [], observations: [], tester: '' };
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) { const d = JSON.parse(raw); db = { vectors: (d.vectors || []).map(normalize), observations: (d.observations || []).map((o) => ({ ...o, author: mapName(o.author) })), tester: d.tester || '' }; return; }
+    for (const key of OLD_KEYS) {
+      const old = localStorage.getItem(key); if (!old) continue;
+      const d = JSON.parse(old);
+      const list = Array.isArray(d) ? d : d.vectors || [];
+      const obs = Array.isArray(d) ? SEED_OBS.slice() : (d.observations || SEED_OBS.slice());
+      db = { vectors: list.map(normalize), observations: obs.map((o) => ({ ...o, author: mapName(o.author) })), tester: TEAM.includes(mapName(d.tester)) ? mapName(d.tester) : '' };
+      saveDB(); return;
+    }
+  } catch (e) { /* bozuk kayıt: örnek verilere dön */ }
+  db = { vectors: SEED.map(normalize), observations: SEED_OBS.slice(), tester: '' };
+}
+function saveDB() {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+  catch (e) { toast('Tarayıcı depolaması kullanılamıyor; veriler yalnızca bu oturumda kalır. JSON indirerek saklayın.'); }
+}
+function uniqueId() {
+  const used = new Set(db.vectors.map((v) => v.id));
+  let i = db.vectors.length + 1, id;
+  do { id = 'C' + String(i++).padStart(2, '0'); } while (used.has(id));
+  return id;
+}
+
+/* =====================================================================
+   4. HESAPLAYICI (tezgah)
+   ===================================================================== */
+const calc = { mode: 'a-priori', src: 'rates' };
+
+function readCalc() {
+  return {
+    mode: calc.mode, src: calc.src,
+    p1: num('c-p1') / 100, p2: num('c-p2') / 100, a1: num('c-a1') / 100,
+    w: num('c-w'), alpha: num('c-alpha'), power: num('c-power'),
+    n: num('c-n'), df: num('c-df')
+  };
+}
+
+function setSeg(groupAttr, value) {
+  document.querySelectorAll(`[data-${groupAttr}]`).forEach((b) => {
+    if (b.closest('#filters')) return;
+    b.setAttribute('aria-pressed', String(b.dataset[groupAttr] === value));
+  });
+}
+
+function syncCalcVisibility() {
+  document.querySelectorAll('.src-rates').forEach((el) => (el.hidden = calc.src !== 'rates'));
+  document.querySelectorAll('.src-w').forEach((el) => (el.hidden = calc.src !== 'w'));
+  document.querySelectorAll('.m-apriori').forEach((el) => (el.hidden = calc.mode !== 'a-priori'));
+  document.querySelectorAll('.m-posthoc').forEach((el) => (el.hidden = calc.mode !== 'post-hoc'));
+  // 2×2 yanıt oranı tablosunda df her zaman 1'dir
+  $('c-df').disabled = calc.src === 'rates';
+  if (calc.src === 'rates') $('c-df').value = 1;
+  setSeg('mode', calc.mode); setSeg('src', calc.src);
+  $('mode-hint').textContent = calc.mode === 'a-priori'
+    ? 'Çalışmaya başlamadan önce: istenen güce ulaşmak için kaç katılımcı gerektiğini bulur.'
+    : 'Veri toplandıktan sonra: elinizdeki N ile hangi güce ulaşıldığını bulur.';
+  $('src-hint').textContent = calc.src === 'rates'
+    ? 'İki grubun beklenen yanıt oranından w türetilir (SPEC R-02). Bizim izimizin çekirdeği budur; df her zaman 1.'
+    : 'w zaten biliniyorsa ya da tablo 2×2\'den büyükse (2×3, 3×3…) kullanın.';
+  $('df-hint').textContent = calc.src === 'rates' ? '2×2 tabloda (2−1)(2−1) = 1, değiştirilemez.' : '2×3 için 2, 3×3 için 4.';
+}
+
+function renderHowto(s, r) {
+  const f = (x) => x.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+  const steps = [
+    '<b>Test family:</b> χ² tests',
+    '<b>Statistical test:</b> Goodness-of-fit tests: Contingency tables',
+    `<b>Type of power analysis:</b> ${s.mode === 'a-priori' ? 'A priori: Compute required sample size' : 'Post hoc: Compute achieved power'}`
+  ];
+  if (s.src === 'rates') {
+    const c = Engine.cells(s.p1, s.p2, s.a1);
+    steps.push(`<b>Effect size w → Determine:</b> 4 hücre için olasılıkları girin, sonra “Calculate and transfer”.<br>
+      <span class="cells"><span>Hücre</span><span>H1 (gözlenen)</span><span>H0 (beklenen)</span>
+      <span>Grup 1 · yanıt</span><span>${f(c.obs[0])}</span><span>${f(c.exp[0])}</span>
+      <span>Grup 1 · yanıt yok</span><span>${f(c.obs[1])}</span><span>${f(c.exp[1])}</span>
+      <span>Grup 2 · yanıt</span><span>${f(c.obs[2])}</span><span>${f(c.exp[2])}</span>
+      <span>Grup 2 · yanıt yok</span><span>${f(c.obs[3])}</span><span>${f(c.exp[3])}</span></span>`);
+  } else steps.push(`<b>Effect size w:</b> ${s.w}`);
+  steps.push(`<b>α err prob:</b> ${s.alpha} · ${s.mode === 'a-priori' ? `<b>Power (1−β err prob):</b> ${s.power}` : `<b>Total sample size:</b> ${s.n}`} · <b>Df:</b> ${s.df}${s.src === 'rates' ? ' (Determine farklı bir df önerse de 1 olmalı)' : ''}`);
+  steps.push(`<b>Calculate</b> deyin; ${s.mode === 'a-priori' ? '“Total sample size” ve “Actual power”' : '“Power (1−β err prob)”'} değerini listeye ekleyeceğiniz satıra yazın.`);
+  $('howto-steps').innerHTML = steps.map((x) => `<li>${x}</li>`).join('');
+}
+
+let lastCalc = null, rafPending = false;
+function queueCalc() {
+  if (rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => { rafPending = false; updateCalc(); });
+}
+
+function updateCalc() {
+  const s = readCalc();
+  const r = Engine.run(s);
+  ['c-p1', 'c-p2', 'c-a1', 'c-w', 'c-alpha', 'c-power', 'c-n', 'c-df'].forEach((id) => $(id).classList.remove('invalid'));
+  if (r.errors.length) {
+    $('calc-err').textContent = r.errors.join(' ');
+    markInvalid(s);
+    ['o-w', 'o-lambda', 'o-crit', 'o-n', 'o-groups', 'o-power'].forEach((id) => ($(id).textContent = '–'));
+    $('curve-path').setAttribute('d', '');
+    $('knob').setAttribute('visibility', 'hidden');
+    $('guide').setAttribute('visibility', 'hidden');
+    $('calc-add').disabled = true;
+    lastCalc = null;
+    return;
+  }
+  $('calc-err').textContent = '';
+  $('calc-add').disabled = false;
+  lastCalc = { s, r };
+  $('o-w').textContent = fmt(r.w);
+  $('o-lambda').textContent = fmt(r.lambda);
+  $('o-crit').textContent = fmt(r.crit);
+  $('o-n').textContent = r.N;
+  $('o-groups').textContent = `${r.n1} / ${r.n2}`;
+  $('o-power').textContent = fmt(r.power);
+  $('out-note').textContent = s.mode === 'a-priori'
+    ? `Test istatistiği ${fmt(r.crit)} değerini aşarsa sonuç anlamlıdır. ${r.N} katılımcıyla λ = w² × N = ${fmt(r.lambda)} olur ve güç ${fmt(s.power, 2)} hedefini ilk kez geçerek ${fmt(r.power)} değerine ulaşır.`
+    : `${r.N} katılımcıyla λ = w² × N = ${fmt(r.lambda)}; gerçek bir fark varsa onu yakalama olasılığı ${fmt(r.power)}.`;
+  renderHowto(s, r);
+  drawCurve(s, r);
+}
+
+function markInvalid(s) {
+  const bad = (id, cond) => { if (cond) $(id).classList.add('invalid'); };
+  if (s.src === 'rates') {
+    bad('c-p1', !(s.p1 > 0 && s.p1 < 1)); bad('c-p2', !(s.p2 > 0 && s.p2 < 1)); bad('c-a1', !(s.a1 > 0 && s.a1 < 1));
+  } else bad('c-w', !(s.w >= 0.001 && s.w <= 10));
+  bad('c-alpha', !(s.alpha > 1e-7 && s.alpha < 1));
+  bad('c-df', !(Number.isInteger(s.df) && s.df >= 1));
+  if (s.mode === 'a-priori') bad('c-power', !(s.power > s.alpha && s.power < 1));
+  else bad('c-n', !(Number.isInteger(s.n) && s.n >= 2));
+}
+
+const PLOT = { L: 44, R: 528, T: 12, B: 166 };
+let curveAxis = null;
+function drawCurve(s, r) {
+  const nMin = 2;
+  const nMax = Math.max(20, Math.ceil(r.N * 2.2));
+  const xOf = (n) => PLOT.L + ((n - nMin) / (nMax - nMin)) * (PLOT.R - PLOT.L);
+  const yOf = (p) => PLOT.B - p * (PLOT.B - PLOT.T);
+  curveAxis = { yOf };
+
+  let grid = '';
+  [0, 0.2, 0.4, 0.6, 0.8, 1].forEach((p) => {
+    const y = yOf(p).toFixed(1);
+    grid += `<line x1="${PLOT.L}" x2="${PLOT.R}" y1="${y}" y2="${y}" stroke="var(--line)"/>`;
+    grid += `<text x="${PLOT.L - 6}" y="${(+y + 3.5).toFixed(1)}" text-anchor="end">${p.toFixed(1)}</text>`;
+  });
+  $('grid').innerHTML = grid;
+  $('ax-min').textContent = `N = ${nMin}`;
+  $('ax-max').textContent = `N = ${nMax}`;
+
+  let d = '';
+  const steps = 60;
+  for (let i = 0; i <= steps; i++) {
+    const n = nMin + (i / steps) * (nMax - nMin);
+    const p = Engine.powerAt(r.w, n, r.crit, s.df);
+    d += (i ? 'L' : 'M') + xOf(n).toFixed(1) + ',' + yOf(p).toFixed(1);
+  }
+  $('curve-path').setAttribute('d', d);
+
+  const tl = $('target-line');
+  if (s.mode === 'a-priori') {
+    const ty = yOf(s.power).toFixed(1);
+    tl.setAttribute('y1', ty); tl.setAttribute('y2', ty); tl.setAttribute('visibility', 'visible');
+  } else tl.setAttribute('visibility', 'hidden');
+
+  const cx = xOf(r.N).toFixed(1), cy = yOf(r.power).toFixed(1);
+  const k = $('knob'), g = $('guide');
+  k.setAttribute('cx', cx); k.setAttribute('cy', cy); k.setAttribute('visibility', 'visible');
+  k.style.cursor = s.mode === 'a-priori' ? 'ns-resize' : 'default';
+  g.setAttribute('x1', cx); g.setAttribute('x2', cx); g.setAttribute('y1', cy); g.setAttribute('y2', PLOT.B);
+  g.setAttribute('visibility', 'visible');
+}
+
+// Eğri sürükleme: dikey konum → hedef güç (yalnız a priori)
+let dragging = false;
+function dragTo(e) {
+  const svg = $('curve');
+  const rect = svg.getBoundingClientRect();
+  const y = (e.clientY - rect.top) * (190 / rect.height);
+  let p = (PLOT.B - y) / (PLOT.B - PLOT.T);
+  const alpha = num('c-alpha');
+  p = Math.min(0.99, Math.max(Number.isFinite(alpha) ? Math.min(0.98, alpha + 0.01) : 0.5, p));
+  $('c-power').value = (Math.round(p * 100) / 100).toFixed(2);
+  queueCalc();
+}
+$('curve').addEventListener('pointerdown', (e) => {
+  if (calc.mode !== 'a-priori' || !lastCalc) return;
+  dragging = true; $('curve').setPointerCapture(e.pointerId); dragTo(e); e.preventDefault();
+});
+$('curve').addEventListener('pointermove', (e) => { if (dragging) dragTo(e); });
+$('curve').addEventListener('pointerup', () => { dragging = false; });
+$('curve').addEventListener('pointercancel', () => { dragging = false; });
+
+['c-p1', 'c-p2', 'c-a1', 'c-w', 'c-alpha', 'c-power', 'c-n', 'c-df'].forEach((id) => $(id).addEventListener('input', queueCalc));
+document.querySelectorAll('.calc [data-mode]').forEach((b) => b.addEventListener('click', () => { calc.mode = b.dataset.mode; syncCalcVisibility(); queueCalc(); }));
+document.querySelectorAll('.calc [data-src]').forEach((b) => b.addEventListener('click', () => { calc.src = b.dataset.src; syncCalcVisibility(); queueCalc(); }));
+
+// Bir senaryoyu hesaplayıcıya yükler
+function loadIntoCalc(v) {
+  calc.mode = v.mode; calc.src = v.src;
+  if (v.src === 'rates') { $('c-p1').value = pct(v.p1); $('c-p2').value = pct(v.p2); $('c-a1').value = pct(v.a1 ?? 0.5); }
+  else $('c-w').value = v.w;
+  $('c-alpha').value = v.alpha;
+  if (v.mode === 'a-priori') $('c-power').value = v.power; else $('c-n').value = v.n;
+  $('c-df').value = v.df;
+  syncCalcVisibility(); updateCalc();
+  $('h-calc').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Hesaplayıcıdaki senaryoyu listeye ekler. G*Power alanları boş kalır:
+// test eden kişi G*Power'da okuduğu değeri kendisi yazar.
+function addScenario(s, title, note) {
+  const who = requireTester(); if (!who) return null;
+  const v = normalize({
+    id: uniqueId(), title, mode: s.mode, src: s.src,
+    p1: s.src === 'rates' ? s.p1 : null, p2: s.src === 'rates' ? s.p2 : null, a1: s.a1,
+    w: s.src === 'w' ? s.w : null, alpha: s.alpha, power: s.power,
+    n: s.mode === 'post-hoc' ? s.n : null, df: s.df,
+    gp_n: null, gp_power: null, researcher: who, time: now(), note
+  });
+  db.vectors.push(v); saveDB(); renderTable();
+  return v;
+}
+$('calc-add').addEventListener('click', () => {
+  if (!lastCalc) return;
+  const s = lastCalc.s;
+  const title = s.src === 'rates'
+    ? `Yanıt oranı %${pct(s.p1)} – %${pct(s.p2)}`
+    : `w = ${s.w}${s.df > 1 ? `, df = ${s.df}` : ''}`;
+  const v = addScenario(s, title, '');
+  if (v) { toast(`${v.id} eklendi. G*Power'da okuduğunuz değeri listede yanına yazın.`); focusGp(v.id); }
+});
+function focusGp(id) {
+  const inp = document.querySelector(`#tbody input[data-id="${CSS.escape(id)}"]`);
+  if (inp) { inp.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => inp.focus(), 300); }
+}
+
+/* =====================================================================
+   5. KARŞILAŞTIRMA LİSTESİ
+   ===================================================================== */
+const POWER_TOL = 0.0005;
+let filterState = 'all', filterTester = '';
+
+function evaluate(v) {
+  const r = Engine.run({ ...v, src: v.src, a1: v.a1 ?? 0.5 });
+  if (r.errors.length) return { r, status: 'bad', reason: 'Geçersiz girdi' };
+  const hasN = v.gp_n != null, hasP = v.gp_power != null;
+  const dP = hasP ? r.power - v.gp_power : null;
+  const pOk = !hasP || Math.abs(dP) <= POWER_TOL;
+  if (v.mode === 'a-priori') {
+    if (!hasN) return { r, status: 'wait', reason: 'Bekliyor' };
+    if (r.N !== v.gp_n) return { r, status: 'bad', reason: `ΔN = ${r.N - v.gp_n > 0 ? '+' : ''}${r.N - v.gp_n}` };
+    if (!pOk) return { r, status: 'bad', reason: `Δgüç = ${dP > 0 ? '+' : ''}${dP.toFixed(4)}` };
+    return { r, status: 'ok', reason: 'Uyumlu' };
+  }
+  if (!hasP) return { r, status: 'wait', reason: 'Bekliyor' };
+  return pOk ? { r, status: 'ok', reason: 'Uyumlu' } : { r, status: 'bad', reason: `Δgüç = ${dP > 0 ? '+' : ''}${dP.toFixed(4)}` };
+}
+
+function inputsText(v) {
+  const eff = v.src === 'rates'
+    ? `p₁ %${pct(v.p1)}, p₂ %${pct(v.p2)}${Math.abs((v.a1 ?? 0.5) - 0.5) > 1e-9 ? `, pay %${pct(v.a1)}` : ''}`
+    : `w ${v.w}`;
+  const tail = v.mode === 'a-priori' ? `güç ${v.power}` : `N ${v.n}`;
+  return `${eff} · α ${v.alpha} · ${tail}`;
+}
+
+function renderTable() {
+  const tbody = $('tbody');
+  const counts = { ok: 0, bad: 0, wait: 0 };
+  const testers = new Set(TEAM);
+  const per = {};
+  let maxDP = 0, rows = '';
+
+  db.vectors.forEach((v, idx) => {
+    const ev = evaluate(v);
+    counts[ev.status]++;
+    if (v.researcher) { testers.add(v.researcher); const c = (per[v.researcher] ||= { n: 0, ok: 0 }); c.n++; if (ev.status === 'ok') c.ok++; }
+    if (v.gp_power != null && Number.isFinite(ev.r.power)) maxDP = Math.max(maxDP, Math.abs(ev.r.power - v.gp_power));
+    if (filterState !== 'all' && ev.status !== filterState) return;
+    if (filterTester && v.researcher !== filterTester) return;
+
+    const r = ev.r, ok = !r.errors.length;
+    const modeTxt = v.mode === 'a-priori' ? 'A priori' : 'Post hoc';
+    const rk = roleOf(v);
+    const gpnCell = v.mode === 'a-priori'
+      ? `<input type="number" step="1" min="2" data-id="${esc(v.id)}" data-idx="${idx}" data-k="gp_n" value="${v.gp_n ?? ''}" placeholder="gir" aria-label="${esc(v.id)} için G*Power N">`
+      : `<span class="hint">girdi</span>`;
+    rows += `<tr>
+      <td><b>${esc(v.id)}</b></td>
+      <td class="title" title="${esc(v.note)}">${esc(v.title || '—')}<small><span class="role ${rk}" title="${esc(ROLES[rk].why)}">${ROLES[rk].label}</span> · ${modeTxt}${v.note ? ' · not var' : ''}</small></td>
+      <td class="inputs">${esc(inputsText(v))}</td>
+      <td class="num">${v.df}</td>
+      <td class="num clone">${ok ? r.N : '–'}</td>
+      <td class="num">${gpnCell}</td>
+      <td class="num clone">${ok ? fmt(r.power) : '–'}</td>
+      <td class="num"><input type="number" step="any" data-id="${esc(v.id)}" data-idx="${idx}" data-k="gp_power" value="${v.gp_power ?? ''}" placeholder="gir" aria-label="${esc(v.id)} için G*Power güç"></td>
+      <td><span class="badge ${ev.status}" title="${{ ok: 'İstenen sonuç: klon G*Power ile aynı.', bad: 'İstenmeyen sonuç: girdileri ve G*Power menüsünü kontrol edin.', wait: 'G*Power değeri henüz girilmedi.' }[ev.status]}">${esc(ev.reason)}</span></td>
+      <td><div class="who">${avatar(v.researcher)}<div>${esc(v.researcher || '—')}<br><span class="hint">${esc(v.time)}</span></div></div></td>
+      <td class="acts"><div class="acts-grid">
+        <button class="link" data-act="load" data-idx="${idx}">Hesapla</button>
+        <button class="link" data-act="edit" data-idx="${idx}">Düzenle</button>
+        <button class="link" data-act="note" data-idx="${idx}">Not</button>
+        <button class="link" data-act="clear" data-idx="${idx}" ${v.gp_n == null && v.gp_power == null ? 'disabled' : ''} title="Satırı bırakır, yalnızca G*Power değerlerini siler">Temizle</button>
+        <button class="link danger" data-act="del" data-idx="${idx}">Sil</button>
+      </div></td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = rows || `<tr><td colspan="11" class="empty">${db.vectors.length ? 'Bu filtreye uyan kayıt yok.' : 'Liste boş. Hesaplayıcıdan bir senaryo ekleyin ya da “Yeni ölçüm ekle”yi kullanın.'}</td></tr>`;
+
+  const measured = counts.ok + counts.bad;
+  const rate = measured ? counts.ok / measured : 0;
+  const gatePass = measured > 0 && rate >= 0.9;
+  $('stats').innerHTML = `
+    <span><b>${db.vectors.length}</b>vektör</span>
+    <span><b>${counts.ok}</b>uyumlu</span>
+    <span><b>${counts.bad}</b>sapma</span>
+    <span><b>${counts.wait}</b>bekleyen</span>
+    <span><b>${measured ? maxDP.toFixed(4) : '–'}</b>en büyük |Δ güç|</span>
+    <span class="${measured ? (gatePass ? 'gate-ok' : 'gate-bad') : ''}"><b>${measured ? `%${(rate * 100).toFixed(0)}` : '–'}</b>%90 kapısı ${measured ? (gatePass ? 'geçti' : 'geçmedi') : '· ölçüm yok'}</span>`;
+  ['all', 'ok', 'bad', 'wait'].forEach((f) => {
+    const b = document.querySelector(`#filters [data-f="${f}"]`);
+    const n = f === 'all' ? db.vectors.length : counts[f];
+    b.textContent = { all: 'Tümü', ok: 'Uyumlu', bad: 'Sapma', wait: 'Bekleyen' }[f] + ` (${n})`;
+  });
+
+  const people = [...TEAM, ...[...testers].filter((t) => !TEAM.includes(t)).sort((a, b) => a.localeCompare(b, 'tr'))];
+  $('team').innerHTML = people.map((t) => {
+    const c = per[t] || { n: 0, ok: 0 };
+    return `<button type="button" class="person" data-who="${esc(t)}" aria-pressed="${t === filterTester}">${avatar(t)}<span><span class="nm">${esc(t)}</span><span class="ct">${c.n} ölçüm · ${c.ok} uyumlu</span></span></button>`;
+  }).join('');
+}
+
+// Tablo içi G*Power değerleri
+$('tbody').addEventListener('change', (e) => {
+  const inp = e.target.closest('input[data-k]'); if (!inp) return;
+  const v = db.vectors[+inp.dataset.idx]; if (!v) return;
+  const raw = inp.value.trim().replace(',', '.');
+  if (raw === '') v[inp.dataset.k] = null;
+  else {
+    const x = Number(raw);
+    if (inp.dataset.k === 'gp_n' && !(Number.isInteger(x) && x >= 2)) { toast('G*Power N, 2 veya daha büyük bir tamsayı olmalı.'); inp.value = v.gp_n ?? ''; return; }
+    if (inp.dataset.k === 'gp_power' && !(x > 0 && x < 1)) { toast('G*Power gücü 0 ile 1 arasında olmalı.'); inp.value = v.gp_power ?? ''; return; }
+    v[inp.dataset.k] = x;
+  }
+  if (tester() && v.researcher !== tester()) { v.researcher = tester(); }
+  v.time = now();
+  saveDB(); renderTable();
+});
+
+$('tbody').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const idx = +b.dataset.idx, v = db.vectors[idx]; if (!v) return;
+  if (b.dataset.act === 'load') loadIntoCalc(v);
+  if (b.dataset.act === 'edit') openDialog(idx);
+  if (b.dataset.act === 'del') {
+    if (await ask({ title: `${v.id} silinsin mi?`, msg: `“${v.title}” satırı ve G*Power değerleri listeden kaldırılacak.`, ok: 'Sil', danger: true })) {
+      const i = db.vectors.indexOf(v); if (i >= 0) db.vectors.splice(i, 1);
+      saveDB(); renderTable(); toast(`${v.id} silindi.`);
+    }
+  }
+  if (b.dataset.act === 'clear') {
+    v.gp_n = null; v.gp_power = null; v.time = now();
+    saveDB(); renderTable(); toast(`${v.id} için G*Power değerleri temizlendi.`);
+  }
+  if (b.dataset.act === 'note') {
+    const who = requireTester(); if (!who) return;
+    const text = await ask({ title: `${v.id} için not`, msg: `Yazan: ${who}`, ok: 'Notu kaydet', input: true });
+    if (text && text.trim()) {
+      v.note = text.trim();
+      db.observations.unshift({ vectorId: v.id, author: who, time: now(), text: text.trim() });
+      saveDB(); renderTable(); renderFeed();
+    }
+  }
+});
+
+$('filters').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  filterState = b.dataset.f;
+  document.querySelectorAll('#filters [data-f]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  renderTable();
+});
+$('team').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-who]'); if (!b) return;
+  filterTester = filterTester === b.dataset.who ? '' : b.dataset.who;
+  renderTable();
+});
+
+/* ---- Ölçüm diyaloğu ---- */
+let editIdx = null;
+function syncDialog() {
+  const src = $('d-src').value, mode = $('d-mode').value;
+  document.querySelectorAll('.d-rates').forEach((el) => (el.hidden = src !== 'rates'));
+  document.querySelectorAll('.d-w').forEach((el) => (el.hidden = src !== 'w'));
+  document.querySelectorAll('.d-apriori').forEach((el) => (el.hidden = mode !== 'a-priori'));
+  document.querySelectorAll('.d-posthoc').forEach((el) => (el.hidden = mode !== 'post-hoc'));
+  $('d-df').disabled = src === 'rates';
+  if (src === 'rates') $('d-df').value = 1;
+}
+$('d-src').addEventListener('change', syncDialog);
+$('d-mode').addEventListener('change', syncDialog);
+
+function openDialog(idx = null) {
+  editIdx = idx;
+  const v = idx == null ? null : db.vectors[idx];
+  $('dlg-title').textContent = v ? `${v.id} düzenle` : 'Yeni G*Power ölçümü';
+  $('dlg-err').textContent = '';
+  const opts = [...new Set([...TEAM, ...(v?.researcher && !TEAM.includes(v.researcher) ? [v.researcher] : [])])];
+  $('d-researcher').innerHTML = '<option value="">Kişi seçin</option>' + opts.map((t) => `<option>${esc(t)}</option>`).join('');
+  $('d-researcher').value = v?.researcher || tester();
+  $('d-id').value = v?.id || uniqueId();
+  $('d-title').value = v?.title || '';
+  $('d-mode').value = v?.mode || 'a-priori';
+  $('d-src').value = v?.src || 'rates';
+  $('d-p1').value = v?.p1 != null ? pct(v.p1) : 45;
+  $('d-p2').value = v?.p2 != null ? pct(v.p2) : 25;
+  $('d-a1').value = pct(v?.a1 ?? 0.5);
+  $('d-w').value = v?.w ?? 0.3;
+  $('d-alpha').value = v?.alpha ?? 0.05;
+  $('d-power').value = v?.power ?? 0.8;
+  $('d-n').value = v?.n ?? 120;
+  $('d-df').value = v?.df ?? 1;
+  $('d-gpn').value = v?.gp_n ?? '';
+  $('d-gpp').value = v?.gp_power ?? '';
+  $('d-note').value = v?.note || '';
+  syncDialog();
+  $('dlg').showModal();
+}
+$('btn-new').addEventListener('click', () => openDialog());
+$('dlg-cancel').addEventListener('click', () => $('dlg').close());
+
+$('dlg-save').addEventListener('click', () => {
+  const who = $('d-researcher').value.trim();
+  const errs = [];
+  if (!who) errs.push('Ölçümü yapan kişiyi seçin.');
+  const id = $('d-id').value.trim();
+  if (!id) errs.push('Test ID boş olamaz.');
+  else if (db.vectors.some((x, i) => x.id === id && i !== editIdx)) errs.push(`${id} zaten listede; başka bir ID seçin.`);
+  const s = {
+    mode: $('d-mode').value, src: $('d-src').value,
+    p1: num('d-p1') / 100, p2: num('d-p2') / 100, a1: num('d-a1') / 100, w: num('d-w'),
+    alpha: num('d-alpha'), power: num('d-power'), n: num('d-n'), df: num('d-df')
+  };
+  const r = Engine.run(s);
+  errs.push(...r.errors);
+  const gpn = num('d-gpn'), gpp = num('d-gpp');
+  if (s.mode === 'a-priori' && Number.isFinite(gpn) && !(Number.isInteger(gpn) && gpn >= 2)) errs.push('G*Power N, 2 veya daha büyük bir tamsayı olmalı.');
+  if (Number.isFinite(gpp) && !(gpp > 0 && gpp < 1)) errs.push('G*Power gücü 0 ile 1 arasında olmalı.');
+  if (errs.length) { $('dlg-err').textContent = errs.join(' '); return; }
+
+  const note = $('d-note').value.trim();
+  const v = normalize({
+    id, title: $('d-title').value.trim() || 'G*Power ölçümü', mode: s.mode, src: s.src,
+    p1: s.src === 'rates' ? s.p1 : null, p2: s.src === 'rates' ? s.p2 : null, a1: s.a1,
+    w: s.src === 'w' ? s.w : null, alpha: s.alpha, power: s.power,
+    n: s.mode === 'post-hoc' ? s.n : null, df: s.df,
+    gp_n: s.mode === 'a-priori' && Number.isFinite(gpn) ? gpn : null,
+    gp_power: Number.isFinite(gpp) ? gpp : null,
+    researcher: who, time: now(), note
+  });
+  const prevNote = editIdx != null ? db.vectors[editIdx].note : '';
+  if (editIdx != null) db.vectors[editIdx] = v; else db.vectors.push(v);
+  if (note && note !== prevNote) db.observations.unshift({ vectorId: id, author: who, time: v.time, text: note });
+  $('tester').value = who; db.tester = who;
+  saveDB(); renderTable(); renderFeed();
+  $('dlg').close();
+  toast(editIdx != null ? `${id} güncellendi.` : `${id} eklendi.`);
+});
+
+/* ---- Dışa / içe aktarma ---- */
+$('btn-json').addEventListener('click', () => {
+  download('gpower_chi2_test_oturumu.json', JSON.stringify({
+    sprint: 'YZM301 G*Power Teardown', test_family: 'chi2-contingency-response-rates',
+    exported_at: new Date().toISOString(), exported_by: tester(),
+    vectors: db.vectors, observations: db.observations
+  }, null, 2), 'application/json');
+});
+$('btn-import').addEventListener('click', () => $('file-import').click());
+$('file-import').addEventListener('change', (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      const d = JSON.parse(reader.result);
+      const list = Array.isArray(d) ? d : d.vectors;
+      if (!Array.isArray(list)) throw new Error('Dosyada “vectors” listesi yok.');
+      const incoming = list.map(normalize);
+      const okMerge = await ask({ title: `${incoming.length} vektör bulundu`, msg: 'Mevcut listeyle birleştirilecek; aynı ID\'ye sahip satırlar güncellenir.', ok: 'Birleştir' });
+      if (!okMerge) { e.target.value = ''; return; }
+      incoming.forEach((v) => {
+        const i = db.vectors.findIndex((x) => x.id === v.id);
+        if (i >= 0) db.vectors[i] = v; else db.vectors.push(v);
+      });
+      if (Array.isArray(d.observations)) db.observations = [...d.observations, ...db.observations];
+      saveDB(); renderTable(); renderFeed();
+      toast(`${incoming.length} vektör içe aktarıldı.`);
+    } catch (err) { toast('Dosya okunamadı: ' + err.message); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+$('btn-csv').addEventListener('click', () => {
+  const q = (x) => `"${String(x ?? '').replace(/"/g, '""')}"`;
+  const head = ['id', 'senaryo', 'mod', 'p1', 'p2', 'grup1_payi', 'w', 'alpha', 'hedef_guc', 'N_girdi', 'df',
+    'klon_N', 'gpower_N', 'klon_guc', 'gpower_guc', 'durum', 'test_eden', 'tarih', 'not'];
+  const lines = db.vectors.map((v) => {
+    const ev = evaluate(v), r = ev.r, ok = !r.errors.length;
+    return [q(v.id), q(v.title), v.mode, v.p1 ?? '', v.p2 ?? '', v.src === 'rates' ? v.a1 : '',
+      ok ? r.w.toFixed(6) : '', v.alpha, v.mode === 'a-priori' ? v.power : '', v.n ?? '', v.df,
+      ok ? r.N : '', v.gp_n ?? '', ok ? r.power.toFixed(6) : '', v.gp_power ?? '',
+      q(ev.reason), q(v.researcher), q(v.time), q(v.note)].join(',');
+  });
+  download('gpower_chi2_karsilastirma.csv', '\uFEFF' + head.join(',') + '\n' + lines.join('\n') + '\n', 'text/csv;charset=utf-8');
+});
+
+$('btn-reset').addEventListener('click', async () => {
+  if (!(await ask({ title: 'Örnek verilere dönülsün mü?', msg: 'Mevcut liste ve notlar silinir, C01–C08 yeniden yüklenir. Önce JSON indirmeniz önerilir.', ok: 'Örnek verileri yükle', danger: true }))) return;
+  db.vectors = SEED.map(normalize); db.observations = SEED_OBS.slice();
+  saveDB(); renderTable(); renderFeed(); toast('Örnek veriler yüklendi.');
+});
+
+/* =====================================================================
+   6. GÖZLEMLER
+   ===================================================================== */
+function renderFeed() {
+  const feed = $('feed');
+  if (!db.observations.length) { feed.innerHTML = '<p class="hint" style="margin:0;">Henüz not yok.</p>'; return; }
+  feed.innerHTML = db.observations.slice(0, 24).map((o, i) => `
+    <div class="obs">
+      <div class="meta"><span><b>${esc(o.vectorId)}</b> · ${esc(o.author)}</span><span>${esc(o.time)}</span></div>
+      <div>${esc(o.text)}</div>
+      <button class="link danger" data-obs="${i}" style="margin: 6px 0 0 -5px; font-size: 12px;">Notu sil</button>
+    </div>`).join('');
+}
+$('feed').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-obs]'); if (!b) return;
+  const o = db.observations[+b.dataset.obs]; if (!o) return;
+  if (await ask({ title: 'Not silinsin mi?', msg: `${o.vectorId} · ${o.author}`, ok: 'Sil', danger: true })) {
+    db.observations.splice(+b.dataset.obs, 1); saveDB(); renderFeed(); toast('Not silindi.');
+  }
+});
+$('btn-clear').addEventListener('click', async () => {
+  if (!db.vectors.length) { toast('Liste zaten boş.'); return; }
+  if (!(await ask({ title: 'Tüm ölçümler silinsin mi?', msg: `${db.vectors.length} satırın tamamı silinecek. Notlar kalır. Önce JSON indirmeniz önerilir.`, ok: 'Tümünü sil', danger: true }))) return;
+  db.vectors = []; saveDB(); renderTable(); toast('Liste boşaltıldı.');
+});
+$('btn-obs').addEventListener('click', async () => {
+  const who = requireTester(); if (!who) return;
+  const text = await ask({ title: 'Genel not', msg: `Gözlem veya REA notu · yazan: ${who}`, ok: 'Notu kaydet', input: true });
+  if (text && text.trim()) { db.observations.unshift({ vectorId: 'Genel', author: who, time: now(), text: text.trim() }); saveDB(); renderFeed(); }
+});
+
+/* =====================================================================
+   7. DOĞAL DİL AJANI (kural tabanlı ayrıştırıcı + aynı motor)
+   ===================================================================== */
+const NUM = String.raw`(%\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*%|\d*\.\d+|\d+)`;
+const toProb = (tok) => {
+  const t = tok.replace(/\s/g, '');
+  const v = parseFloat(t.replace('%', ''));
+  return t.includes('%') || v > 1 ? v / 100 : v;
+};
+
+function parseQuery(text) {
+  let s = text.toLocaleLowerCase('tr-TR')
+    .replace(/(\d),(\d)/g, '$1.$2')
+    .replace(/×/g, 'x').replace(/α/g, 'alfa').replace(/β/g, 'beta');
+  const used = [];
+  const take = (re) => {
+    const m = re.exec(s);
+    if (!m) return null;
+    used.push([m.index, m.index + m[0].length]);
+    return m;
+  };
+  const notes = [];
+
+  // df: r × c tablo ya da açık df
+  let df = 1;
+  const mt = take(/(\d+)\s*x\s*(\d+)/);
+  if (mt) df = Math.max(1, (parseInt(mt[1]) - 1) * (parseInt(mt[2]) - 1));
+  else {
+    const md = take(/(?:serbestlik\s*derecesi|\bdf\b|degrees?\s*of\s*freedom)\s*(?:=|:|is)?\s*(?:olan\s*)?(\d+)/) ||
+               take(/(\d+)\s*serbestlik/);
+    if (md) df = parseInt(md[1]);
+  }
+
+  // α
+  let alpha = 0.05;
+  const ma = take(new RegExp(String.raw`(?:alfa|alpha|anlamlılık(?:\s*düzeyi)?|significance(?:\s*level)?|p\s*<)\s*(?:=|:|değeri)?\s*` + NUM)) ||
+             take(new RegExp(NUM + String.raw`\s*(?:anlamlılık|alfa|alpha)`));
+  if (ma) alpha = toProb(ma[1]); else notes.push('α bulunamadı, 0.05 kullanıldı');
+
+  // Hedef güç / güç değeri
+  let power = 0.80, powerFound = false;
+  const mp = take(new RegExp(String.raw`(?:hedef\s*güç|istatistiksel\s*güç|güç|power|1\s*-\s*beta)\s*(?:=|:|değeri)?\s*` + NUM)) ||
+             take(new RegExp(NUM + String.raw`\s*(?:hedef\s*)?(?:istatistiksel\s*)?(?:güç|power)`));
+  if (mp) { power = toProb(mp[1]); powerFound = true; }
+
+  // w
+  let w = null;
+  const mw = take(/(?:cohen(?:'?s)?\s*w|etki\s*büyüklüğü\s*w|\bw\b|etki\s*büyüklüğü|effect\s*size)\s*(?:=|:)?\s*(\d*\.\d+|\d+)/);
+  if (mw) w = parseFloat(mw[1]);
+
+  // N
+  let n = null;
+  const mn = take(/(\d+)\s*(?:denek|hasta|katılımcı|kişi|birey|gözlem|subjects?|participants?|patients?)/) ||
+             take(/(?:\bn\b|toplam\s*n|örneklem)\s*(?:=|:)\s*(\d+)/);
+  if (mn) n = parseInt(mn[1]);
+
+  // Yanıt oranları
+  let p1 = null, p2 = null;
+  const g1 = take(new RegExp(String.raw`(?:grup\s*1|1\.\s*grup|birinci\s*grup|group\s*1|p1|p₁)[^%\d]{0,40}?` + NUM));
+  const g2 = take(new RegExp(String.raw`(?:grup\s*2|2\.\s*grup|ikinci\s*grup|group\s*2|p2|p₂)[^%\d]{0,40}?` + NUM));
+  if (g1) p1 = toProb(g1[1]);
+  if (g2) p2 = toProb(g2[1]);
+  if (p1 == null || p2 == null) {
+    // Kullanılmamış yüzdelerden ilk ikisini al
+    const free = [];
+    const re = /%\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*%/g;
+    let m;
+    while ((m = re.exec(s))) {
+      const a = m.index, b = a + m[0].length;
+      if (!used.some(([x, y]) => a < y && b > x)) free.push(toProb(m[0]));
+    }
+    if (p1 == null && free.length) p1 = free.shift();
+    if (p2 == null && free.length) p2 = free.shift();
+  }
+
+  // Mod
+  const asksN = /kaç\s*(?:denek|hasta|kişi|katılımcı)|örneklem\s*(?:boyutu|büyüklüğü)|sample\s*size|how\s*many/.test(s);
+  const asksPower = /post[\s-]*hoc|elde\s*e|ulaşılan\s*güç|gerçekleşen\s*güç|gücü?\s*(?:nedir|ne\s*olur|kaçtır)|achieved\s*power/.test(s);
+  const mode = asksPower && !asksN && n != null ? 'post-hoc' : 'a-priori';
+  if (mode === 'a-priori' && !powerFound) notes.push('Hedef güç bulunamadı, 0.80 kullanıldı');
+
+  let src = null;
+  if (w != null) src = 'w';
+  else if (p1 != null && p2 != null) { src = 'rates'; df = 1; }
+
+  return { mode, src, w, p1, p2, a1: 0.5, alpha, power, n, df, notes };
+}
+
+let lastAgent = null;
+function runAgent(q) {
+  q = (q || '').trim();
+  if (!q) { toast('Bir soru yazın ya da örneklerden birini seçin.'); $('agent-q').focus(); return; }
+  const p = parseQuery(q);
+  const out = $('agent-out'), chips = $('agent-chips'), pre = $('agent-text');
+  out.hidden = false;
+  $('agent-to-calc').disabled = $('agent-to-list').disabled = true;
+  lastAgent = null;
+
+  if (!p.src) {
+    chips.innerHTML = '<span class="chip warn">Etki büyüklüğü bulunamadı</span>';
+    pre.textContent = 'Sorudan etki büyüklüğü çıkarılamadı. Ya “w = 0.3” gibi bir değer ya da iki grubun yanıt oranını yazın (örn. “Grup 1 %30, Grup 2 %50”).';
+    return;
+  }
+  const r = Engine.run(p);
+  if (r.errors.length) {
+    chips.innerHTML = '<span class="chip warn">Geçersiz parametre</span>';
+    pre.textContent = r.errors.join('\n');
+    return;
+  }
+  lastAgent = { q, p, r };
+  $('agent-to-calc').disabled = $('agent-to-list').disabled = false;
+
+  const c = [
+    p.mode === 'a-priori' ? 'A priori' : 'Post hoc',
+    p.src === 'rates' ? `p₁ %${pct(p.p1)}, p₂ %${pct(p.p2)}` : `w ${p.w}`,
+    `α ${p.alpha}`, `df ${p.df}`,
+    p.mode === 'a-priori' ? `hedef güç ${p.power}` : `N ${p.n}`
+  ].map((t) => `<span class="chip">${esc(t)}</span>`);
+  p.notes.forEach((t) => c.push(`<span class="chip warn">${esc(t)}</span>`));
+  chips.innerHTML = c.join('');
+
+  const L = [];
+  L.push(`İstem: ${q}`, '');
+  L.push(`Etki büyüklüğü w      : ${fmt(r.w)}`);
+  L.push(`Serbestlik derecesi df: ${p.df}`);
+  L.push(`α                     : ${p.alpha}`);
+  L.push(`Kritik χ²             : ${fmt(r.crit)}`);
+  L.push(`Merkezi olmama λ      : ${fmt(r.lambda)}`);
+  if (p.mode === 'a-priori') {
+    L.push(`Toplam N              : ${r.N}  (grup 1: ${r.n1}, grup 2: ${r.n2})`);
+    L.push(`Gerçekleşen güç       : ${fmt(r.power)}`, '');
+    L.push('Protokol metni:');
+    L.push(`Gruplar arasındaki yanıt oranları χ² bağımsızlık testiyle (df = ${p.df}) karşılaştırılacaktır. ` +
+      `Cohen w = ${fmt(r.w, 3)}, α = ${p.alpha} ve ${p.power} hedef güç için yapılan a priori güç analizi ` +
+      `en az N = ${r.N} katılımcı gerektirmektedir (gerçekleşen güç = ${fmt(r.power, 3)}).`);
+  } else {
+    L.push(`Toplam N              : ${p.n}`);
+    L.push(`Elde edilen güç       : ${fmt(r.power)}`, '');
+    L.push('Protokol metni:');
+    L.push(`N = ${p.n} katılımcıyla yürütülen χ² testinde (df = ${p.df}, α = ${p.alpha}), ` +
+      `w = ${fmt(r.w, 3)} etki büyüklüğü için post hoc güç ${fmt(r.power, 3)} olarak hesaplanmıştır.`);
+  }
+  pre.textContent = L.join('\n');
+}
+
+$('agent-run').addEventListener('click', () => runAgent($('agent-q').value));
+$('agent-q').addEventListener('keydown', (e) => { if (e.key === 'Enter') runAgent(e.target.value); });
+document.querySelectorAll('.examples [data-q]').forEach((b) => b.addEventListener('click', () => {
+  $('agent-q').value = b.dataset.q; runAgent(b.dataset.q);
+}));
+$('agent-to-calc').addEventListener('click', () => {
+  if (!lastAgent) return;
+  loadIntoCalc({ ...lastAgent.p });
+  toast('Parametreler hesaplayıcıya aktarıldı.');
+});
+$('agent-to-list').addEventListener('click', () => {
+  if (!lastAgent) return;
+  const { p } = lastAgent;
+  const title = p.src === 'rates' ? `Ajan: %${pct(p.p1)} – %${pct(p.p2)}` : `Ajan: w = ${p.w}, df = ${p.df}`;
+  const v = addScenario(p, title, `İstem: ${lastAgent.q}`);
+  if (v) { toast(`${v.id} eklendi. G*Power değerini listede yanına yazın.`); focusGp(v.id); }
+});
+
+/* =====================================================================
+   8. BAŞLANGIÇ
+   ===================================================================== */
+// Test rehberi
+$('guide-tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-g]'); if (!b) return;
+  document.querySelectorAll('#guide-tabs [data-g]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  document.querySelectorAll('[data-gp]').forEach((el) => (el.hidden = el.dataset.gp !== b.dataset.g));
+});
+$('guide-scen').innerHTML = SEED.map((v) => {
+  const rk = SEED_ROLES[v.id];
+  return `<tr><td><b>${v.id}</b></td><td>${esc(SCEN_WHAT[v.id])}</td><td><span class="role ${rk}">${ROLES[rk].label}</span></td><td>${esc(ROLES[rk].why)}${v.id === 'C07' || v.id === 'C08' ? ' Şu an ölçülmemiş.' : ''}</td><td><button class="link" data-seed="${v.id}">Hesapla</button></td></tr>`;
+}).join('');
+$('guide-scen').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-seed]'); if (!b) return;
+  loadIntoCalc(normalize(SEED.find((x) => x.id === b.dataset.seed)));
+});
+
+loadDB();
+$('tester').innerHTML = '<option value="">Kişi seçin</option>' + TEAM.map((t) => `<option>${esc(t)}</option>`).join('');
+$('tester').value = TEAM.includes(db.tester) ? db.tester : '';
+$('tester').addEventListener('change', () => { db.tester = tester(); saveDB(); });
+syncCalcVisibility();
+updateCalc();
+renderTable();
+renderFeed();
+
+// Konsoldan hızlı öz-test: selfTest()
+window.selfTest = () => db.vectors.map((v) => ({ id: v.id, ...evaluate(v), r: undefined }));
+</script>
+</body>
+</html>
