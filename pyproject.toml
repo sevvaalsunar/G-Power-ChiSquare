@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gpower-chi2-forge"
+version = "1.0.0"
+description = "Clean-room Hexagonal implementation of G*Power 3.1.9.7 Chi-Square (Contingency Tables & Goodness-of-Fit) statistical power engine with MCP and Clinical AI Agent."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "YZM301 Clean-Room Engineering Team"}
+]
+dependencies = [
+    "scipy>=1.11.0",
+    "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+]
+
+[project.scripts]
+gpower-clone = "gpower_chi2_forge.adapters.cli_adapter:main_gpower_clone"
+gpower-chi2-cli = "gpower_chi2_forge.adapters.cli_adapter:main"
+gpower-chi2-mcp = "gpower_chi2_forge.adapters.mcp_server:main"
+gpower-chi2-benchmark = "gpower_chi2_forge.agent.benchmark_runner:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-ra -q"

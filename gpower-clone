@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""
+Standalone `gpower-clone` executable entry point for CONTRACT.md v1.0.0.
+Works both when installed via `pip install -e .` and when invoked directly (`./gpower-clone`).
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+import sys
+
+REPO_ROOT = Path(__file__).resolve().parent
+SRC_DIR = REPO_ROOT / "src"
+if SRC_DIR.exists() and str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from gpower_chi2_forge.adapters.cli_adapter import main_gpower_clone
+
+if __name__ == "__main__":
+    sys.exit(main_gpower_clone())

@@ -1,0 +1,831 @@
+{
+  "version": "3.1.9.7",
+  "vector_count": 35,
+  "vectors": [
+    {
+      "vector_id": "GP-01",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.95,
+        "w": 0.3,
+        "df": 1
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 1,
+        "n_total": 145,
+        "actual_power": 0.950785,
+        "power": 0.950785,
+        "alpha": 0.05,
+        "beta": 0.049215,
+        "effect_size_w": 0.3,
+        "critical_chi2": 3.841459,
+        "noncentrality_lambda": 13.05,
+        "continuous_n": 144.385657
+      }
+    },
+    {
+      "vector_id": "GP-02",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.8,
+        "w": 0.3,
+        "df": 1
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 1,
+        "n_total": 88,
+        "actual_power": 0.803527,
+        "power": 0.803527,
+        "alpha": 0.05,
+        "beta": 0.196473,
+        "effect_size_w": 0.3,
+        "critical_chi2": 3.841459,
+        "noncentrality_lambda": 7.92,
+        "continuous_n": 87.209561
+      }
+    },
+    {
+      "vector_id": "GP-03",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.01,
+        "power": 0.9,
+        "w": 0.3,
+        "df": 2
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 2,
+        "n_total": 194,
+        "actual_power": 0.900685,
+        "power": 0.900685,
+        "alpha": 0.01,
+        "beta": 0.099315,
+        "effect_size_w": 0.3,
+        "critical_chi2": 9.21034,
+        "noncentrality_lambda": 17.46,
+        "continuous_n": 193.629879
+      }
+    },
+    {
+      "vector_id": "GP-04",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.95,
+        "w": 0.3,
+        "df": 2
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 2,
+        "n_total": 172,
+        "actual_power": 0.950469,
+        "power": 0.950469,
+        "alpha": 0.05,
+        "beta": 0.049531,
+        "effect_size_w": 0.3,
+        "critical_chi2": 5.991465,
+        "noncentrality_lambda": 15.48,
+        "continuous_n": 171.591507
+      }
+    },
+    {
+      "vector_id": "GP-05",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.8,
+        "w": 0.1,
+        "df": 1
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 1,
+        "n_total": 785,
+        "actual_power": 0.800057,
+        "power": 0.800057,
+        "alpha": 0.05,
+        "beta": 0.199943,
+        "effect_size_w": 0.1,
+        "critical_chi2": 3.841459,
+        "noncentrality_lambda": 7.85,
+        "continuous_n": 784.886051
+      }
+    },
+    {
+      "vector_id": "GP-06",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.9,
+        "w": 0.1,
+        "df": 3
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 3,
+        "n_total": 1418,
+        "actual_power": 0.900189,
+        "power": 0.900189,
+        "alpha": 0.05,
+        "beta": 0.099811,
+        "effect_size_w": 0.1,
+        "critical_chi2": 7.814728,
+        "noncentrality_lambda": 14.18,
+        "continuous_n": 1417.14873
+      }
+    },
+    {
+      "vector_id": "GP-07",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.8,
+        "w": 0.25,
+        "df": 4
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 4,
+        "n_total": 191,
+        "actual_power": 0.800083,
+        "power": 0.800083,
+        "alpha": 0.05,
+        "beta": 0.199917,
+        "effect_size_w": 0.25,
+        "critical_chi2": 9.487729,
+        "noncentrality_lambda": 11.9375,
+        "continuous_n": 190.964573
+      }
+    },
+    {
+      "vector_id": "GP-08",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.01,
+        "power": 0.95,
+        "w": 0.25,
+        "df": 5
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 5,
+        "n_total": 413,
+        "actual_power": 0.950486,
+        "power": 0.950486,
+        "alpha": 0.01,
+        "beta": 0.049514,
+        "effect_size_w": 0.25,
+        "critical_chi2": 15.086272,
+        "noncentrality_lambda": 25.8125,
+        "continuous_n": 412.192999
+      }
+    },
+    {
+      "vector_id": "GP-09",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.1,
+        "power": 0.8,
+        "w": 0.25,
+        "df": 2
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 2,
+        "n_total": 124,
+        "actual_power": 0.801898,
+        "power": 0.801898,
+        "alpha": 0.1,
+        "beta": 0.198102,
+        "effect_size_w": 0.25,
+        "critical_chi2": 4.60517,
+        "noncentrality_lambda": 7.75,
+        "continuous_n": 123.368476
+      }
+    },
+    {
+      "vector_id": "GP-10",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.9,
+        "w": 0.5,
+        "df": 1
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 1,
+        "n_total": 43,
+        "actual_power": 0.906375,
+        "power": 0.906375,
+        "alpha": 0.05,
+        "beta": 0.093625,
+        "effect_size_w": 0.5,
+        "critical_chi2": 3.841459,
+        "noncentrality_lambda": 10.75,
+        "continuous_n": 42.029678
+      }
+    },
+    {
+      "vector_id": "GP-11",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.01,
+        "power": 0.95,
+        "w": 0.5,
+        "df": 3
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 3,
+        "n_total": 91,
+        "actual_power": 0.950791,
+        "power": 0.950791,
+        "alpha": 0.01,
+        "beta": 0.049209,
+        "effect_size_w": 0.5,
+        "critical_chi2": 11.344867,
+        "noncentrality_lambda": 22.75,
+        "continuous_n": 90.697026
+      }
+    },
+    {
+      "vector_id": "GP-12",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.8,
+        "w": 0.5,
+        "df": 10
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 10,
+        "n_total": 65,
+        "actual_power": 0.800268,
+        "power": 0.800268,
+        "alpha": 0.05,
+        "beta": 0.199732,
+        "effect_size_w": 0.5,
+        "critical_chi2": 18.307038,
+        "noncentrality_lambda": 16.25,
+        "continuous_n": 64.964441
+      }
+    },
+    {
+      "vector_id": "GP-13",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.05,
+        "power": 0.95,
+        "w": 0.8,
+        "df": 1
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 1,
+        "n_total": 21,
+        "actual_power": 0.956005,
+        "power": 0.956005,
+        "alpha": 0.05,
+        "beta": 0.043995,
+        "effect_size_w": 0.8,
+        "critical_chi2": 3.841459,
+        "noncentrality_lambda": 13.44,
+        "continuous_n": 20.304233
+      }
+    },
+    {
+      "vector_id": "GP-14",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.01,
+        "power": 0.9,
+        "w": 0.8,
+        "df": 4
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 4,
+        "n_total": 33,
+        "actual_power": 0.906855,
+        "power": 0.906855,
+        "alpha": 0.01,
+        "beta": 0.093145,
+        "effect_size_w": 0.8,
+        "critical_chi2": 13.276704,
+        "noncentrality_lambda": 21.12,
+        "continuous_n": 32.40149
+      }
+    },
+    {
+      "vector_id": "GP-15",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "a-priori",
+        "alpha": 0.1,
+        "power": 0.95,
+        "w": 0.8,
+        "df": 10
+      },
+      "expected": {
+        "mode": "a-priori",
+        "df": 10,
+        "n_total": 33,
+        "actual_power": 0.951005,
+        "power": 0.951005,
+        "alpha": 0.1,
+        "beta": 0.048995,
+        "effect_size_w": 0.8,
+        "critical_chi2": 15.987179,
+        "noncentrality_lambda": 21.12,
+        "continuous_n": 32.840538
+      }
+    },
+    {
+      "vector_id": "GP-16",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "post-hoc",
+        "alpha": 0.05,
+        "w": 0.3,
+        "n": 145,
+        "df": 1
+      },
+      "expected": {
+        "mode": "post-hoc",
+        "df": 1,
+        "n_total": 145,
+        "actual_power": 0.950785,
+        "power": 0.950785,
+        "alpha": 0.05,
+        "beta": 0.049215,
+        "effect_size_w": 0.3,
+        "critical_chi2": 3.841459,
+        "noncentrality_lambda": 13.05
+      }
+    },
+    {
+      "vector_id": "GP-17",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "post-hoc",
+        "alpha": 0.01,
+        "w": 0.25,
+        "n": 150,
+        "df": 5
+      },
+      "expected": {
+        "mode": "post-hoc",
+        "df": 5,
+        "n_total": 150,
+        "actual_power": 0.406353,
+        "power": 0.406353,
+        "alpha": 0.01,
+        "beta": 0.593647,
+        "effect_size_w": 0.25,
+        "critical_chi2": 15.086272,
+        "noncentrality_lambda": 9.375
+      }
+    },
+    {
+      "vector_id": "GP-18",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "post-hoc",
+        "alpha": 0.05,
+        "w": 0.1,
+        "n": 1000,
+        "df": 2
+      },
+      "expected": {
+        "mode": "post-hoc",
+        "df": 2,
+        "n_total": 1000,
+        "actual_power": 0.815421,
+        "power": 0.815421,
+        "alpha": 0.05,
+        "beta": 0.184579,
+        "effect_size_w": 0.1,
+        "critical_chi2": 5.991465,
+        "noncentrality_lambda": 10.0
+      }
+    },
+    {
+      "vector_id": "GP-19",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "post-hoc",
+        "alpha": 0.1,
+        "w": 0.5,
+        "n": 60,
+        "df": 4
+      },
+      "expected": {
+        "mode": "post-hoc",
+        "df": 4,
+        "n_total": 60,
+        "actual_power": 0.938955,
+        "power": 0.938955,
+        "alpha": 0.1,
+        "beta": 0.061045,
+        "effect_size_w": 0.5,
+        "critical_chi2": 7.77944,
+        "noncentrality_lambda": 15.0
+      }
+    },
+    {
+      "vector_id": "GP-20",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "post-hoc",
+        "alpha": 0.05,
+        "w": 0.8,
+        "n": 40,
+        "df": 10
+      },
+      "expected": {
+        "mode": "post-hoc",
+        "df": 10,
+        "n_total": 40,
+        "actual_power": 0.960302,
+        "power": 0.960302,
+        "alpha": 0.05,
+        "beta": 0.039698,
+        "effect_size_w": 0.8,
+        "critical_chi2": 18.307038,
+        "noncentrality_lambda": 25.6
+      }
+    },
+    {
+      "vector_id": "GP-21",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "compromise",
+        "q_ratio": 1.0,
+        "w": 0.3,
+        "n": 100,
+        "df": 1
+      },
+      "expected": {
+        "mode": "compromise",
+        "df": 1,
+        "n_total": 100,
+        "actual_power": 0.906796,
+        "power": 0.906796,
+        "alpha": 0.093204,
+        "beta": 0.093204,
+        "effect_size_w": 0.3,
+        "critical_chi2": 2.818139,
+        "noncentrality_lambda": 9.0,
+        "q_ratio": 1.0
+      }
+    },
+    {
+      "vector_id": "GP-22",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "compromise",
+        "q_ratio": 2.0,
+        "w": 0.25,
+        "n": 160,
+        "df": 2
+      },
+      "expected": {
+        "mode": "compromise",
+        "df": 2,
+        "n_total": 160,
+        "actual_power": 0.855398,
+        "power": 0.855398,
+        "alpha": 0.072301,
+        "beta": 0.144602,
+        "effect_size_w": 0.25,
+        "critical_chi2": 5.253829,
+        "noncentrality_lambda": 10.0,
+        "q_ratio": 2.0
+      }
+    },
+    {
+      "vector_id": "GP-23",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "compromise",
+        "q_ratio": 4.0,
+        "w": 0.5,
+        "n": 80,
+        "df": 3
+      },
+      "expected": {
+        "mode": "compromise",
+        "df": 3,
+        "n_total": 80,
+        "actual_power": 0.936215,
+        "power": 0.936215,
+        "alpha": 0.015946,
+        "beta": 0.063785,
+        "effect_size_w": 0.5,
+        "critical_chi2": 10.331816,
+        "noncentrality_lambda": 20.0,
+        "q_ratio": 4.0
+      }
+    },
+    {
+      "vector_id": "GP-24",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "compromise",
+        "q_ratio": 0.5,
+        "w": 0.3,
+        "n": 120,
+        "df": 4
+      },
+      "expected": {
+        "mode": "compromise",
+        "df": 4,
+        "n_total": 120,
+        "actual_power": 0.908004,
+        "power": 0.908004,
+        "alpha": 0.183992,
+        "beta": 0.091996,
+        "effect_size_w": 0.3,
+        "critical_chi2": 6.210178,
+        "noncentrality_lambda": 10.8,
+        "q_ratio": 0.5
+      }
+    },
+    {
+      "vector_id": "GP-25",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "compromise",
+        "q_ratio": 1.0,
+        "w": 0.8,
+        "n": 50,
+        "df": 10
+      },
+      "expected": {
+        "mode": "compromise",
+        "df": 10,
+        "n_total": 50,
+        "actual_power": 0.976958,
+        "power": 0.976958,
+        "alpha": 0.023042,
+        "beta": 0.023042,
+        "effect_size_w": 0.8,
+        "critical_chi2": 20.732025,
+        "noncentrality_lambda": 32.0,
+        "q_ratio": 1.0
+      }
+    },
+    {
+      "vector_id": "GP-26",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "criterion",
+        "power": 0.8,
+        "w": 0.3,
+        "n": 100,
+        "df": 1
+      },
+      "expected": {
+        "mode": "criterion",
+        "df": 1,
+        "n_total": 100,
+        "actual_power": 0.8,
+        "power": 0.8,
+        "alpha": 0.030898,
+        "beta": 0.2,
+        "effect_size_w": 0.3,
+        "critical_chi2": 4.658601,
+        "noncentrality_lambda": 9.0
+      }
+    },
+    {
+      "vector_id": "GP-27",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "criterion",
+        "power": 0.9,
+        "w": 0.25,
+        "n": 200,
+        "df": 2
+      },
+      "expected": {
+        "mode": "criterion",
+        "df": 2,
+        "n_total": 200,
+        "actual_power": 0.9,
+        "power": 0.9,
+        "alpha": 0.05255,
+        "beta": 0.1,
+        "effect_size_w": 0.25,
+        "critical_chi2": 5.891982,
+        "noncentrality_lambda": 12.5
+      }
+    },
+    {
+      "vector_id": "GP-28",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "criterion",
+        "power": 0.95,
+        "w": 0.5,
+        "n": 80,
+        "df": 3
+      },
+      "expected": {
+        "mode": "criterion",
+        "df": 3,
+        "n_total": 80,
+        "actual_power": 0.95,
+        "power": 0.95,
+        "alpha": 0.022313,
+        "beta": 0.05,
+        "effect_size_w": 0.5,
+        "critical_chi2": 9.597791,
+        "noncentrality_lambda": 20.0
+      }
+    },
+    {
+      "vector_id": "GP-29",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "criterion",
+        "power": 0.8,
+        "w": 0.1,
+        "n": 900,
+        "df": 5
+      },
+      "expected": {
+        "mode": "criterion",
+        "df": 5,
+        "n_total": 900,
+        "actual_power": 0.8,
+        "power": 0.8,
+        "alpha": 0.148255,
+        "beta": 0.2,
+        "effect_size_w": 0.1,
+        "critical_chi2": 8.148195,
+        "noncentrality_lambda": 9.0
+      }
+    },
+    {
+      "vector_id": "GP-30",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "criterion",
+        "power": 0.9,
+        "w": 0.8,
+        "n": 45,
+        "df": 10
+      },
+      "expected": {
+        "mode": "criterion",
+        "df": 10,
+        "n_total": 45,
+        "actual_power": 0.9,
+        "power": 0.9,
+        "alpha": 0.006115,
+        "beta": 0.1,
+        "effect_size_w": 0.8,
+        "critical_chi2": 24.619556,
+        "noncentrality_lambda": 28.8
+      }
+    },
+    {
+      "vector_id": "GP-31",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "sensitivity",
+        "alpha": 0.05,
+        "power": 0.8,
+        "n": 100,
+        "df": 1
+      },
+      "expected": {
+        "mode": "sensitivity",
+        "df": 1,
+        "n_total": 100,
+        "actual_power": 0.8,
+        "power": 0.8,
+        "alpha": 0.05,
+        "beta": 0.2,
+        "effect_size_w": 0.280158,
+        "critical_chi2": 3.841459,
+        "noncentrality_lambda": 7.848861
+      }
+    },
+    {
+      "vector_id": "GP-32",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "sensitivity",
+        "alpha": 0.01,
+        "power": 0.9,
+        "n": 200,
+        "df": 2
+      },
+      "expected": {
+        "mode": "sensitivity",
+        "df": 2,
+        "n_total": 200,
+        "actual_power": 0.9,
+        "power": 0.9,
+        "alpha": 0.01,
+        "beta": 0.1,
+        "effect_size_w": 0.295184,
+        "critical_chi2": 9.21034,
+        "noncentrality_lambda": 17.426689
+      }
+    },
+    {
+      "vector_id": "GP-33",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "sensitivity",
+        "alpha": 0.05,
+        "power": 0.95,
+        "n": 150,
+        "df": 3
+      },
+      "expected": {
+        "mode": "sensitivity",
+        "df": 3,
+        "n_total": 150,
+        "actual_power": 0.95,
+        "power": 0.95,
+        "alpha": 0.05,
+        "beta": 0.05,
+        "effect_size_w": 0.338328,
+        "critical_chi2": 7.814728,
+        "noncentrality_lambda": 17.169898
+      }
+    },
+    {
+      "vector_id": "GP-34",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "sensitivity",
+        "alpha": 0.1,
+        "power": 0.8,
+        "n": 120,
+        "df": 5
+      },
+      "expected": {
+        "mode": "sensitivity",
+        "df": 5,
+        "n_total": 120,
+        "actual_power": 0.8,
+        "power": 0.8,
+        "alpha": 0.1,
+        "beta": 0.2,
+        "effect_size_w": 0.295055,
+        "critical_chi2": 9.236357,
+        "noncentrality_lambda": 10.446877
+      }
+    },
+    {
+      "vector_id": "GP-35",
+      "source": "G*Power 3.1.9.7 Track 4 (Chi-Square Contingency / Goodness-of-Fit)",
+      "inputs": {
+        "mode": "sensitivity",
+        "alpha": 0.05,
+        "power": 0.9,
+        "n": 250,
+        "df": 10
+      },
+      "expected": {
+        "mode": "sensitivity",
+        "df": 10,
+        "n_total": 250,
+        "actual_power": 0.9,
+        "power": 0.9,
+        "alpha": 0.05,
+        "beta": 0.1,
+        "effect_size_w": 0.28658,
+        "critical_chi2": 18.307038,
+        "noncentrality_lambda": 20.531971
+      }
+    }
+  ]
+}
